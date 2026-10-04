@@ -1,0 +1,2489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>El Tesoro del Pizzero</title>
+<style>
+/* ===================== ESTILOS ===================== */
+:root{
+  --crema:#fff3dc; --crema2:#f7e2bd; --madera:#c98b52; --madera2:#9a6234; --tomate:#e2553f; --tomate2:#a63a28;
+  --queso:#f6c445; --albahaca:#6aa84f; --turquesa:#3fb8af; --rosa:#f28fad; --cafe:#6b3e26; --choco:#3b2418;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:#f7e2bd;font-family:"Baloo 2","Comic Sans MS","Chalkboard SE","Arial Rounded MT Bold","Trebuchet MS",sans-serif;color:var(--choco);user-select:none;-webkit-user-select:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;outline:none}
+.oculto{display:none!important}
+.panel{background:var(--crema);border-radius:22px;border:3px dashed #d79a5e;box-shadow:0 0 0 6px var(--crema),0 0 0 10px #b9773f,0 8px 18px rgba(80,40,10,.35)}
+.btn{min-width:56px;min-height:56px;border-radius:18px;background:var(--tomate);border:3px dashed var(--crema);box-shadow:0 0 0 4px var(--tomate),0 6px 0 4px var(--tomate2);color:var(--crema);font:inherit;font-size:22px;font-weight:bold;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:6px 12px;touch-action:none}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 4px var(--tomate),0 2px 0 4px var(--tomate2)}
+.btn.verde{background:var(--albahaca);box-shadow:0 0 0 4px var(--albahaca),0 6px 0 4px #3f7a30}
+.btn.turq{background:var(--turquesa);box-shadow:0 0 0 4px var(--turquesa),0 6px 0 4px #23807a}
+.btn.madera{background:var(--madera);box-shadow:0 0 0 4px var(--madera),0 6px 0 4px var(--madera2)}
+.btn svg{width:40px;height:40px;pointer-events:none}
+.btn.grande{min-width:96px;min-height:84px;border-radius:24px}
+.btn.grande svg{width:60px;height:60px}
+.late{animation:late 1.1s ease-in-out infinite}
+@keyframes late{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+/* HUD */
+#hud{position:fixed;inset:0;pointer-events:none}
+#hud>*{pointer-events:auto}
+#objetivo{position:absolute;left:18px;top:18px;width:104px;height:104px;display:flex;align-items:center;justify-content:center}
+#objetivo svg{width:86px;height:86px}
+#minimapa{position:absolute;right:18px;top:18px;width:116px;height:116px;padding:6px}
+#minimapa canvas{width:100%;height:100%;display:block;border-radius:12px}
+#topBtns{position:absolute;top:18px;left:50%;transform:translateX(-50%);display:flex;gap:16px}
+#sub{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;max-width:min(680px,calc(100% - 260px));min-height:72px}
+#subCara{width:58px;height:58px;flex:none}
+#subCara svg{width:58px;height:58px}
+#subTxt{font-size:clamp(22px,3.4vw,34px);font-weight:bold;line-height:1.1;color:var(--choco)}
+#sub.hablando #subCara{animation:habla .35s ease-in-out infinite}
+@keyframes habla{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px) rotate(-4deg)}}
+#pad{position:absolute;left:18px;bottom:18px;display:grid;grid-template-columns:repeat(3,66px);grid-template-rows:repeat(2,66px);gap:8px}
+#pad .btn{min-width:66px;min-height:66px;padding:0}
+#bVolver{position:absolute;left:18px;bottom:18px}
+#bMesa{position:absolute;right:18px;bottom:18px}
+#bSaltar{position:absolute;right:18px;top:150px}
+#teclas{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);padding:14px 18px;display:flex;gap:26px;align-items:center}
+#teclas svg{height:96px;width:auto}
+#mano{position:fixed;left:0;top:0;width:76px;height:76px;pointer-events:none;z-index:20;transform:translate(-200px,-200px)}
+#mano svg{width:76px;height:76px;filter:drop-shadow(0 4px 3px rgba(80,40,10,.4))}
+/* Letras de fieltro */
+#nombreFieltro{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;gap:10px;align-items:center;pointer-events:none;z-index:15}
+.letra{display:inline-flex;align-items:center;justify-content:center;min-width:1.05em;height:1.35em;padding:0 .12em;font-size:clamp(46px,9vmin,96px);font-weight:900;color:var(--crema);background:var(--tomate);border-radius:16px;border:4px dashed rgba(255,243,220,.85);box-shadow:0 0 0 6px var(--tomate),0 10px 0 6px var(--tomate2),0 18px 24px rgba(80,40,10,.35);animation:popLetra .45s cubic-bezier(.3,1.8,.5,1) both}
+.letra.esp{background:transparent;border:none;box-shadow:none;min-width:.4em}
+.fraccion{display:inline-flex;flex-direction:column;align-items:center;margin-left:.35em;font-size:clamp(34px,7vmin,74px);font-weight:900;color:var(--crema);background:var(--turquesa);border-radius:18px;padding:.08em .35em;border:4px dashed rgba(255,243,220,.85);box-shadow:0 0 0 6px var(--turquesa),0 10px 0 6px #23807a;animation:popLetra .5s .5s cubic-bezier(.3,1.8,.5,1) both;line-height:1}
+.fraccion i{display:block;width:100%;height:6px;background:var(--crema);border-radius:3px;margin:4px 0}
+@keyframes popLetra{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+/* Pantallas */
+.pantalla{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:30;padding:16px}
+#menu{background:radial-gradient(ellipse at center,rgba(255,243,220,.15),rgba(107,62,38,.45))}
+.letrero{background:repeating-linear-gradient(90deg,#c98b52 0 38px,#bf8049 38px 76px);border-radius:26px;padding:16px 28px;box-shadow:0 0 0 6px #9a6234,0 12px 0 6px #7a4a24,0 20px 30px rgba(60,30,10,.45);text-align:center;color:var(--crema);text-shadow:0 4px 0 #7a4a24}
+.letrero h1{margin:0;font-size:clamp(34px,6vw,64px);line-height:1}
+.caja{display:flex;flex-direction:column;align-items:center;gap:18px;max-width:640px;width:100%}
+.filaNombre{display:flex;align-items:center;gap:12px;padding:10px 14px;width:100%}
+.filaNombre svg{width:56px;height:56px;flex:none}
+#nombre{flex:1;min-width:0;font:inherit;font-size:36px;font-weight:bold;padding:8px 16px;border-radius:16px;border:3px dashed #d79a5e;background:#fffaf0;color:var(--choco);outline:none}
+#nombre:focus{border-color:var(--tomate)}
+#bJugar{min-width:240px;min-height:96px;font-size:44px;border-radius:30px}
+#bJugar svg{width:64px;height:64px}
+#opciones{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;padding:14px}
+#opciones label{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:bold;background:#fffaf0;border-radius:16px;padding:6px 12px;border:3px dashed #d79a5e;cursor:pointer;min-height:56px}
+#opciones input{width:30px;height:30px;accent-color:var(--tomate)}
+#opciones svg{width:40px;height:40px}
+#menuPipo{width:120px;height:120px}
+#pausa{background:rgba(107,62,38,.55)}
+#pausa .caja{padding:28px}
+#resultado{background:rgba(107,62,38,.45);overflow:auto;align-items:flex-start}
+#resultado .caja{max-width:820px;padding:22px;margin:auto}
+#resNombre{font-size:clamp(30px,5vw,48px);font-weight:900;color:var(--tomate);text-align:center}
+.filaRes{display:flex;gap:22px;align-items:center;justify-content:center;flex-wrap:wrap;font-size:34px;font-weight:bold}
+.filaRes svg{width:52px;height:52px;vertical-align:middle}
+#estrellas svg{width:72px;height:72px}
+#aprendi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%}
+.concepto{background:#fffaf0;border-radius:18px;border:3px dashed #d79a5e;padding:8px;text-align:center;font-weight:bold;font-size:22px}
+.concepto svg{width:70px;height:70px}
+.concepto .frac{font-size:26px;color:var(--turquesa)}
+.puntos{display:flex;gap:4px;justify-content:center;margin-top:4px}
+.puntos b{width:16px;height:16px;border-radius:50%;background:#ead2a8;border:2px dashed #c98b52}
+.puntos b.si{background:var(--albahaca);border-color:#3f7a30}
+#copiaTxt{width:100%;font:inherit;font-size:18px;padding:8px;border-radius:12px;border:3px dashed #d79a5e;background:#fffaf0}
+#errorCdn{z-index:50;background:#f7e2bd}
+#errorCdn .caja{padding:24px;font-size:22px;text-align:center}
+#debug{position:fixed;left:8px;top:140px;z-index:40;background:rgba(255,243,220,.93);border:2px dashed #b9773f;border-radius:10px;padding:8px 10px;font:13px/1.35 monospace;white-space:pre;color:#3b2418;pointer-events:none}
+#toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:45;max-width:90vw;max-height:80vh;overflow:auto;font:15px/1.4 monospace;white-space:pre-wrap;padding:16px}
+@media (max-width:760px){#sub{max-width:calc(100% - 24px);bottom:96px}#aprendi{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<canvas id="c" tabindex="0"></canvas>
+
+<div id="hud" class="oculto">
+  <div id="objetivo" class="panel" title="Objetivo"></div>
+  <div id="topBtns"><button id="bPausa" class="btn madera" aria-label="Pausa"></button><button id="bMudo" class="btn madera" aria-label="Sonido"></button></div>
+  <div id="minimapa" class="panel"><canvas id="mm" width="128" height="128"></canvas></div>
+  <div id="sub" class="panel oculto"><div id="subCara"></div><div id="subTxt"></div><button id="bRepetir" class="btn turq" aria-label="Repetir"></button></div>
+  <div id="pad" class="oculto">
+    <span></span><button class="btn turq" data-mov="adelante" aria-label="Adelante"></button><span></span>
+    <button class="btn turq" data-mov="izq" aria-label="Girar izquierda"></button><button class="btn turq" data-mov="atras" aria-label="Atrás"></button><button class="btn turq" data-mov="der" aria-label="Girar derecha"></button>
+  </div>
+  <button id="bVolver" class="btn grande madera oculto" aria-label="Volver"></button>
+  <button id="bMesa" class="btn grande verde oculto" aria-label="Mesa"></button>
+  <button id="bSaltar" class="btn madera oculto" aria-label="Saltar"></button>
+  <div id="teclas" class="panel oculto"></div>
+</div>
+<div id="mano"></div>
+<div id="nombreFieltro" class="oculto"></div>
+
+<div id="menu" class="pantalla">
+  <div class="caja">
+    <div class="letrero"><h1>El Tesoro<br>del Pizzero</h1></div>
+    <div id="menuPipo"></div>
+    <div class="filaNombre panel"><span id="icoNombre"></span><input id="nombre" maxlength="14" autocomplete="off" placeholder="Tu nombre" aria-label="Tu nombre"></div>
+    <button id="bJugar" class="btn verde late"></button>
+    <button id="bOpciones" class="btn madera" aria-label="Opciones"></button>
+    <div id="opciones" class="panel oculto">
+      <label><input type="checkbox" id="oClic"><span id="icoClic"></span>Modo clic</label>
+      <label><input type="checkbox" id="oEfectos"><span id="icoEfectos"></span>Menos efectos</label>
+      <label><input type="checkbox" id="oVoz" checked><span id="icoVoz"></span>Voz</label>
+      <label><input type="checkbox" id="oTercio" checked><span id="icoTercio"></span>Tercio</label>
+    </div>
+  </div>
+</div>
+
+<div id="pausa" class="pantalla oculto">
+  <div class="caja panel">
+    <div class="letrero"><h1 id="icoPausaGrande"></h1></div>
+    <button id="bSeguir" class="btn verde grande" aria-label="Seguir"></button>
+    <div style="display:flex;gap:18px"><button id="bMudo2" class="btn madera" aria-label="Sonido"></button><button id="bMenu" class="btn" aria-label="Menú"></button></div>
+  </div>
+</div>
+
+<div id="resultado" class="pantalla oculto">
+  <div class="caja panel">
+    <div id="resNombre"></div>
+    <div class="filaRes"><span id="resTiempo"></span><span id="estrellas"></span></div>
+    <div class="letrero"><h1 style="font-size:clamp(26px,4vw,40px)">Lo que aprendí</h1></div>
+    <div id="aprendi"></div>
+    <div class="filaRes"><button id="bCopiar" class="btn turq"></button><button id="bOtraVez" class="btn verde"></button></div>
+    <textarea id="copiaTxt" class="oculto" rows="2" readonly></textarea>
+  </div>
+</div>
+
+<div id="errorCdn" class="pantalla oculto">
+  <div class="caja panel">
+    <b>No se pudo cargar el motor 3D (Three.js).</b>
+    <span>Para el docente: este juego necesita internet la primera vez que se abre. Conecte la computadora y pulse "Reintentar".</span>
+    <button class="btn verde" onclick="location.reload()">Reintentar</button>
+  </div>
+</div>
+<div id="debug" class="oculto"></div>
+<div id="toast" class="panel oculto"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+/* =====================================================================
+   EL TESORO DEL PIZZERO — juego educativo de fracciones (1.º y 2.º grado)
+   Un solo archivo. Three.js r128 desde cdnjs. Sin recursos externos.
+   ===================================================================== */
+if (!window.THREE) {
+  document.getElementById('errorCdn').classList.remove('oculto');
+  document.getElementById('menu').classList.add('oculto');
+  throw new Error('Three.js no cargó');
+}
+
+/* ===================== 1. CONFIG ===================== */
+const CONFIG = {
+  MESA_W: 2.6, MESA_D: 1.4, MESA_H: 0.95,     // tablero de cada mesa (m)
+  PLANO_ALTURA: 0.12,                          // plano invisible de arrastre = mesa + 0.12
+  SNAP_EXTRA: 0.18, BONUS_PISTA: 0.15,         // radio de encaje = radius + 0.18 (+0.15 con pista 2)
+  LERP_ARRASTRE: 0.35, TAP_PX: 6,
+  T_ENCAJE: 0.35, T_VOLVER: 0.3, T_CAMARA: 0.8, PITCH_MESA: 40,
+  PISTAS: [20, 40, 70],                        // segundos en modo mesa
+  OJOS: 1.15, VEL: 2.2, GIRO: 1.9, PITCH_MAX: 35, RADIO_JUG: 0.3,
+  SALA: { x: 6.7, z: 4.7 }, FOV: 60,
+  MAX_PARTICULAS: 120, MAX_NODOS: 8, PR_MAX: 1.5, FPS_MIN: 40,
+  VOL_MUSICA: 0.06, VOL_SFX: 0.55,
+  C: { // paleta cálida, sin negros ni grises puros
+    crema: 0xfff3dc, crema2: 0xf7e2bd, madera: 0xc98b52, madera2: 0x9a6234, tomate: 0xe2553f,
+    queso: 0xf6c445, queso2: 0xfbd978, albahaca: 0x6aa84f, turquesa: 0x3fb8af, rosa: 0xf28fad,
+    cafe: 0x6b3e26, choco: 0x3b2418, corteza: 0xe3a35a, cielo: 0x9fd8ef, ladrillo: 0xc8643c,
+    dorado: 0xf2b632, jamon: 0xf4a3a8, champi: 0xe9d6b8, piel: 0xf2c39b, gris: 0xc9b8c4, hoja: 0x58a05a
+  }
+};
+const MESAS = [ // centro (x,z) en mundo y hacia dónde mira el frente (lado de la cámara)
+  { nombre: 'práctica', c: [-5.4, 2.4], f: [1, 0], color: 'turquesa' },
+  { nombre: 'mostrador', c: [-5.4, -1.9], f: [1, 0], color: 'rosa' },
+  { nombre: 'masa', c: [-2.3, -3.7], f: [0, 1], color: 'queso' },
+  { nombre: 'horno', c: [2.3, -3.2], f: [0, 1], color: 'tomate' },
+  { nombre: 'clientes', c: [5.4, -1.6], f: [-1, 0], color: 'albahaca' },
+  { nombre: 'tesoro', c: [5.4, 2.4], f: [-1, 0], color: 'dorado' }
+];
+
+/* ===================== 2. CONTENIDO (voz, subtítulo ≤ 4 palabras, ícono) ===================== */
+const CONTENIDO = {
+  intro1: { quien: 'gino', voz: '¡Hola! Soy Don Gino, el pizzero.', sub: 'Hola, soy Don Gino', icono: 'gino' },
+  intro2: { quien: 'gino', voz: 'Escondí un tesoro en mi pizzería.', sub: 'Escondí un tesoro', icono: 'gino' },
+  intro3: { quien: 'gino', voz: 'Rompí el mapa en cuatro partes iguales.', sub: 'Mapa en 4 partes', icono: 'mapa' },
+  intro4: { quien: 'gino', voz: 'Tú serás mi ayudante. ¡Pipo te va a ayudar!', sub: '¡Eres mi ayudante!', icono: 'gino' },
+  pipoHola: { voz: '¡Hola, {n}! Soy Pipo. ¡Sígueme!', sub: '¡Hola, {n}!', icono: 'pipo' },
+  tutCaminar: { voz: 'Camina con las flechas, o toca el botón verde.', sub: 'Camina hacia mí', icono: 'pasos' },
+  tutVer: { voz: 'Mira. Así se arrastra el queso al plato.', sub: 'Queso al plato', icono: 'queso' },
+  tutHacer: { voz: '¡Ahora tú! Lleva el queso al plato.', sub: '¡Ahora tú!', icono: 'queso' },
+  tutToca: { voz: 'También puedes tocar el queso, y luego tocar el plato.', sub: 'Toca queso, toca plato', icono: 'mano' },
+  tutBien: { voz: '¡Muy bien! ¡Ya sabes ayudar! Vamos a la primera mesa.', sub: '¡Muy bien!', icono: 'pipo' },
+  bien1: { voz: '¡Muy bien!', sub: '¡Muy bien!', icono: 'pipo' },
+  bien2: { voz: '¡Genial!', sub: '¡Genial!', icono: 'pipo' },
+  bien3: { voz: '¡Lo lograste!', sub: '¡Lo lograste!', icono: 'pipo' },
+  bien4: { voz: '¡Bravo!', sub: '¡Bravo!', icono: 'pipo' },
+  siguiente: { voz: '¡Vamos a la siguiente mesa!', sub: '¡A la siguiente mesa!', icono: 'pasos' },
+  vuelve: { voz: '¡Ven, {n}! Es por aquí.', sub: '¡Es por aquí!', icono: 'pasos' },
+  errGrande: { voz: 'Mira. Ese pedazo es más grande. ¡Prueba otro!', sub: 'Es más grande', icono: 'ojo' },
+  errChica: { voz: 'Mira. Ese pedazo es más chico. ¡Prueba otro!', sub: 'Es más chico', icono: 'ojo' },
+  errNoIguales: { voz: 'Mira. Sus partes no son iguales.', sub: 'No son iguales', icono: 'ojo' },
+  errNoMitad: { voz: 'Mira. Ese corte no parte por la mitad.', sub: 'No es la mitad', icono: 'ojo' },
+  errLleno: { voz: 'Ese ya tiene. ¡Uno para cada uno!', sub: 'Uno para cada uno', icono: 'ojo' },
+  errMitadLlena: { voz: 'Esa mitad ya tiene. Usa la otra mitad.', sub: 'Usa la otra mitad', icono: 'ojo' },
+  errMapa: { voz: 'Ese hueco no es. ¡Prueba otro!', sub: 'Prueba otro hueco', icono: 'ojo' },
+  errPlato: { voz: 'Ese no va ahí. ¡Prueba otra vez!', sub: 'Prueba otra vez', icono: 'ojo' },
+  errChampi: { voz: 'Solo en un cuarto. ¡Ya está listo!', sub: 'Solo un cuarto', icono: 'ojo' },
+  demoError: { voz: 'Mira, te muestro cómo.', sub: 'Te muestro', icono: 'ojo' },
+  pista1: { voz: '¡Mira lo que brilla!', sub: '¡Mira lo que brilla!', icono: 'brillo' },
+  pista2: { voz: 'Sigue las migajas.', sub: 'Sigue las migajas', icono: 'migajas' },
+  pista3: { voz: 'Te ayudo con este.', sub: 'Te ayudo', icono: 'pipo' },
+  mapa1: { voz: '¡Una parte del mapa! Tienes un cuarto del mapa.', sub: 'Un cuarto del mapa', icono: 'mapa' },
+  mapa2: { voz: '¡Ya tienes dos cuartos del mapa! Dos cuartos son la mitad.', sub: 'Dos cuartos: ¡mitad!', icono: 'mapa' },
+  mapa3: { voz: '¡Tres cuartos del mapa! Falta uno.', sub: 'Tres cuartos', icono: 'mapa' },
+  mapa4: { voz: '¡Cuatro cuartos! ¡El mapa entero!', sub: '¡Mapa entero!', icono: 'mapa' },
+  // Estación 1: partes iguales
+  e1Intro: { voz: 'Don Gino solo guarda pizzas con partes iguales.', sub: 'Partes iguales', icono: 'iguales' },
+  e1Ver: { voz: 'Mira: partes iguales son del mismo tamaño.', sub: 'Mismo tamaño', icono: 'iguales' },
+  e1Hacer: { voz: 'Pon en la caja las pizzas con partes iguales.', sub: 'Iguales a la caja', icono: 'caja' },
+  e1Entender: { voz: 'Mira: todas las partes son del mismo tamaño.', sub: 'Mismo tamaño', icono: 'iguales' },
+  e1Nombre: { voz: '¡Partes iguales!', sub: 'Partes iguales', icono: 'iguales' },
+  // Estación 2: la mitad
+  e2Intro: { voz: 'Hay que partir esta pizza por la mitad.', sub: 'Partir por la mitad', icono: 'mitad' },
+  e2Ver: { voz: 'La mitad: dos partes iguales.', sub: 'Dos partes iguales', icono: 'mitad' },
+  e2Hacer: { voz: 'Lleva la cuchilla a la línea que parte por la mitad.', sub: 'Cuchilla a la mitad', icono: 'cuchilla' },
+  e2Bien: { voz: '¡Corte justo por el centro!', sub: '¡Justo al centro!', icono: 'mitad' },
+  e2Entender: { voz: 'Mira: las dos mitades son iguales.', sub: 'Dos mitades iguales', icono: 'mitad' },
+  e2Nombre: { voz: '¡La mitad! Un medio.', sub: 'Mitad, un medio', icono: 'mitad' },
+  e2Ingred: { voz: 'Ahora pon queso en una mitad, y jamón en la otra.', sub: 'Queso y jamón', icono: 'ingred' },
+  e2Fin: { voz: '¡Una mitad con queso, y una mitad con jamón!', sub: '¡Mitad y mitad!', icono: 'mitad' },
+  // Estación 3: el cuarto
+  e3Intro: { voz: 'Vamos a armar una pizza de cuartos para el horno.', sub: 'Pizza de cuartos', icono: 'cuarto' },
+  e3Ver: { voz: 'Un cuarto: la pizza en cuatro partes iguales.', sub: 'Cuatro partes iguales', icono: 'cuarto' },
+  e3Hacer: { voz: 'Pon cuatro cuartos en la bandeja.', sub: 'Cuatro cuartos', icono: 'cuarto' },
+  e3Bien: { voz: '¡Ese es un cuarto!', sub: '¡Un cuarto!', icono: 'cuarto' },
+  e3Entender: { voz: 'Mira: los cuatro cuartos son iguales.', sub: 'Cuartos iguales', icono: 'cuarto' },
+  e3Nombre: { voz: '¡Un cuarto!', sub: 'Un cuarto', icono: 'cuarto' },
+  e3Champi: { voz: 'Pon champiñones en un solo cuarto.', sub: 'Champiñones en un cuarto', icono: 'champi' },
+  e3Fin: { voz: '¡Un cuarto con champiñones! ¡Al horno!', sub: '¡Al horno!', icono: 'horno' },
+  // Estación 4: comparar y el tercio
+  e4Intro: { voz: 'Tito, Lola y Beto tienen hambre.', sub: '¡Tienen hambre!', icono: 'raton' },
+  e4Ver: { voz: 'Mira: la mitad y el cuarto.', sub: 'Mitad y cuarto', icono: 'comparar' },
+  e4Hacer: { voz: 'Pon la estrella en el pedazo más grande.', sub: 'Estrella al más grande', icono: 'estrella' },
+  e4Bien: { voz: '¡Sí! La mitad es más grande que un cuarto.', sub: '¡Mitad, más grande!', icono: 'comparar' },
+  e4Entender: { voz: 'Mira: dos cuartos caben en una mitad.', sub: 'Dos cuartos, una mitad', icono: 'comparar' },
+  e4TVer: { voz: 'Un tercio: la pizza en tres partes iguales.', sub: 'Tres partes iguales', icono: 'tercio' },
+  e4THacer: { voz: 'Dale un pedazo a cada ratoncito.', sub: 'Uno para cada uno', icono: 'raton' },
+  e4TEntender: { voz: 'Mira: los tres pedazos son iguales.', sub: 'Tres pedazos iguales', icono: 'tercio' },
+  e4TNombre: { voz: '¡Un tercio!', sub: 'Un tercio', icono: 'tercio' },
+  gracias: { quien: 'raton', voz: '¡Gracias!', sub: '¡Gracias!', icono: 'raton' },
+  // Estación 5: el tesoro
+  e5Intro: { voz: '¡Ya tienes las cuatro partes! Arma el mapa.', sub: '¡Arma el mapa!', icono: 'mapa' },
+  e5Hacer: { voz: 'Cada parte va en su lugar.', sub: 'Cada parte, su lugar', icono: 'mapa' },
+  e5Entender: { voz: 'El mapa tiene cuatro partes iguales.', sub: 'Cuatro partes iguales', icono: 'mapa' },
+  e5Nombre: { voz: '¡Cuatro cuartos hacen un entero!', sub: '¡Un mapa entero!', icono: 'mapa' },
+  e5Bodega: { voz: '¡El tesoro está en la bodega! Tiene tres candados.', sub: '¡Tres candados!', icono: 'candado' },
+  e5Ronda: { quien: 'gino', voz: 'Para abrir cada candado, dame lo que te pido.', sub: 'Dame lo que pido', icono: 'gino' },
+  pedMitad: { quien: 'gino', voz: 'Dame la mitad.', sub: 'Dame la mitad', icono: 'mitad' },
+  pedTercio: { quien: 'gino', voz: 'Dame un tercio.', sub: 'Dame un tercio', icono: 'tercio' },
+  pedCuarto: { quien: 'gino', voz: 'Dame un cuarto.', sub: 'Dame un cuarto', icono: 'cuarto' },
+  pedBien: { voz: '¡Correcto! ¡Se abrió un candado!', sub: '¡Un candado menos!', icono: 'candado' },
+  final1: { voz: '¡Se abrió la bodega!', sub: '¡Se abrió!', icono: 'candado' },
+  final2: { quien: 'gino', voz: '¡La Pizza Dorada! ¡Gracias, {n}!', sub: '¡Gracias, {n}!', icono: 'gino' },
+  final3: { voz: '¡Un cuarto para cada amigo!', sub: '¡Un cuarto cada uno!', icono: 'cuarto' },
+  resultado: { voz: '¡Eres un gran pizzero, {n}!', sub: '¡Gran pizzero!', icono: 'pipo' }
+};
+const PALABRAS = { // letras de fieltro de NOMBRAR
+  iguales: { txt: 'iguales', frac: null }, mitad: { txt: 'mitad', frac: [1, 2] },
+  cuarto: { txt: 'cuarto', frac: [1, 4] }, tercio: { txt: 'tercio', frac: [1, 3] }, entero: { txt: 'entero', frac: [4, 4] }
+};
+
+/* ===================== 3. UTILIDADES ===================== */
+const V3 = THREE.Vector3;
+const PI = Math.PI, TAU = Math.PI * 2, DEG = Math.PI / 180;
+const $ = (id) => document.getElementById(id);
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+const rnd = (a, b) => a + Math.random() * (b - a);
+function barajar(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = arr[i]; arr[i] = arr[j]; arr[j] = t; } return arr; }
+const EASE = {
+  lineal: (t) => t,
+  suave: (t) => t * t * (3 - 2 * t),
+  salida: (t) => 1 - (1 - t) * (1 - t),
+  back: (t) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+};
+// Centroide de un sector circular de ángulo th (rad) y radio R, medido desde el vértice
+function centroideSector(th, R) { return (4 * R * Math.sin(th / 2)) / (3 * th); }
+function rellenar(txt, vars) { return txt.replace(/\{n\}/g, (vars && vars.n) || G.nombre); }
+
+/* Estado global */
+const G = {
+  estado: 'MENU', estadoPrevio: null, pausa: false, modo: 'menu', // modo: menu | caminar | mesa | trans | cine
+  t: 0, nombre: 'Ayudante', debug: false,
+  opc: { clic: false, menosEfectos: false, voz: true, tercio: true },
+  est: -1, mapa: [false, false, false, false], piezasMapa: 0,
+  pistas: 0, conceptos: { iguales: [0, 0], mitad: [0, 0], cuarto: [0, 0], tercio: [0, 0] },
+  tInicio: 0, tFin: 0, mudo: false, planes: null, ranuras: [], piezas: [], pickables: []
+};
+
+/* ===================== 4. HILOS (esperas cancelables con tiempo de juego) ===================== */
+let hiloGen = 0;
+const esperas = [];   // {t, res, gen}
+const senales = [];   // {nombre, res, gen}
+function esperar(s) { const gen = hiloGen; return new Promise((res) => esperas.push({ t: G.t + s, res, gen })); }
+function esperarSenal(nombre) { const gen = hiloGen; return new Promise((res) => senales.push({ nombre, res, gen })); }
+function emitir(nombre, dato) {
+  for (let i = senales.length - 1; i >= 0; i--) {
+    const s = senales[i];
+    if (s.nombre === nombre) { senales.splice(i, 1); if (s.gen === hiloGen) s.res(dato); }
+  }
+}
+function cancelarHilos() { hiloGen++; esperas.length = 0; senales.length = 0; }
+function actualizarEsperas() {
+  for (let i = esperas.length - 1; i >= 0; i--) {
+    const e = esperas[i];
+    if (G.t >= e.t) { esperas.splice(i, 1); if (e.gen === hiloGen) e.res(); }
+  }
+}
+
+/* ===================== 5. ANIMACIONES (tweens) ===================== */
+const anims = [];
+function animar(dur, fn, ease, alFin) {
+  const a = { t: 0, dur: Math.max(0.001, dur), fn, ease: ease || EASE.suave, alFin, muerto: false };
+  anims.push(a); fn(0); return a;
+}
+function animarP(dur, fn, ease) { const gen = hiloGen; return new Promise((res) => animar(dur, fn, ease, () => { if (gen === hiloGen) res(); })); }
+function actualizarAnims(dt) {
+  for (let i = anims.length - 1; i >= 0; i--) {
+    const a = anims[i];
+    if (a.muerto) { anims.splice(i, 1); continue; }
+    a.t += dt;
+    const k = Math.min(1, a.t / a.dur);
+    a.fn(a.ease(k));
+    if (k >= 1) { anims.splice(i, 1); a.muerto = true; if (a.alFin) a.alFin(); }
+  }
+}
+function cancelarAnim(a) { if (a) a.muerto = true; }
+
+/* ===================== 6. TEXTURAS (canvas pequeños, reutilizados) ===================== */
+function hacerTex(w, h, dibujar, repetir) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d'); dibujar(ctx, w, h);
+  const t = new THREE.CanvasTexture(cv);
+  if (repetir !== false) { t.wrapS = t.wrapT = THREE.RepeatWrapping; }
+  t.anisotropy = 1; return t;
+}
+function hex(c) { return '#' + c.toString(16).padStart(6, '0'); }
+const TEX = {};
+function crearTexturas() {
+  TEX.madera = hacerTex(128, 128, (x, w, h) => {
+    x.fillStyle = '#fff7ec'; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 26; i++) {
+      x.strokeStyle = i % 3 ? 'rgba(214,170,120,.35)' : 'rgba(190,140,90,.4)'; x.lineWidth = rnd(1, 3);
+      const y0 = rnd(0, h); x.beginPath(); x.moveTo(0, y0);
+      for (let px = 0; px <= w; px += 16) x.lineTo(px, y0 + Math.sin(px * 0.05 + i) * 3);
+      x.stroke();
+    }
+  });
+  TEX.fieltro = hacerTex(128, 128, (x, w, h) => {
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 900; i++) {
+      x.strokeStyle = `rgba(${200 + rnd(0, 40) | 0},${185 + rnd(0, 40) | 0},${170 + rnd(0, 40) | 0},.35)`;
+      const px = rnd(0, w), py = rnd(0, h), a = rnd(0, TAU); x.lineWidth = 1;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * 4, py + Math.sin(a) * 4); x.stroke();
+    }
+  });
+  // Atlas vichy: 6 celdas de 256x128 (una por color de mantel)
+  const COLS = MESAS.map((m) => CONFIG.C[m.color]);
+  TEX.vichy = hacerTex(256, 768, (x) => {
+    COLS.forEach((c, k) => {
+      const y0 = k * 128; x.fillStyle = '#fffaf0'; x.fillRect(0, y0, 256, 128);
+      x.fillStyle = hex(c); x.globalAlpha = 0.5;
+      for (let i = 0; i < 16; i++) x.fillRect(i * 16, y0, 8, 128);
+      for (let j = 0; j < 8; j++) x.fillRect(0, y0 + j * 16, 256, 8);
+      x.globalAlpha = 1;
+    });
+  }, false);
+  TEX.piso = hacerTex(128, 128, (x) => {
+    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) {
+      x.fillStyle = (i + j) % 2 ? '#d9875f' : '#fbecd2'; x.fillRect(i * 64, j * 64, 64, 64);
+    }
+    x.strokeStyle = 'rgba(160,100,60,.25)'; x.lineWidth = 2; x.strokeRect(1, 1, 126, 126);
+  });
+  TEX.ladrillo = hacerTex(128, 128, (x) => {
+    x.fillStyle = '#f3dcc0'; x.fillRect(0, 0, 128, 128);
+    for (let f = 0; f < 8; f++) for (let c = -1; c < 4; c++) {
+      const off = f % 2 ? 16 : 0; const v = rnd(-14, 14) | 0;
+      x.fillStyle = `rgb(${236 + v},${200 + v},${180 + v})`;
+      x.fillRect(c * 32 + off + 2, f * 16 + 2, 28, 12);
+    }
+  });
+  TEX.cielo = hacerTex(128, 128, (x) => {
+    const g = x.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, '#9fd8ef'); g.addColorStop(1, '#ffe2b0');
+    x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+    x.fillStyle = '#fffaf0';
+    [[30, 30, 14], [44, 26, 12], [56, 32, 10], [92, 44, 12], [104, 40, 10]].forEach(([a, b, r]) => { x.beginPath(); x.arc(a, b, r, 0, TAU); x.fill(); });
+    const techos = ['#e2553f', '#f28fad', '#3fb8af', '#f6c445'];
+    for (let i = 0; i < 6; i++) {
+      const bx = i * 24 - 4, bh = 26 + (i % 3) * 8;
+      x.fillStyle = i % 2 ? '#fbecd2' : '#f7d9b0'; x.fillRect(bx, 128 - bh, 22, bh);
+      x.fillStyle = techos[i % 4]; x.beginPath(); x.moveTo(bx - 3, 128 - bh); x.lineTo(bx + 11, 128 - bh - 12); x.lineTo(bx + 25, 128 - bh); x.fill();
+    }
+  }, false);
+  TEX.punto = hacerTex(64, 64, (x) => {
+    const g = x.createRadialGradient(32, 32, 2, 32, 32, 30);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.6, 'rgba(255,255,255,.9)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  }, false);
+  TEX.mapa = crearTexMapa();
+}
+// El mapa del tesoro se dibuja UNA vez y se corta en 4 cuadrantes iguales (UV)
+let MAPA_CANVAS = null;
+function crearTexMapa() {
+  return hacerTex(256, 256, (x) => {
+    MAPA_CANVAS = x.canvas;
+    x.fillStyle = '#f6e3b4'; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = '#c98b52'; x.lineWidth = 6; x.strokeRect(6, 6, 244, 244);
+    // camino punteado
+    x.setLineDash([10, 8]); x.strokeStyle = '#e2553f'; x.lineWidth = 6; x.beginPath();
+    x.moveTo(30, 220); x.bezierCurveTo(70, 150, 40, 70, 110, 60); x.bezierCurveTo(170, 50, 120, 150, 180, 160); x.lineTo(212, 196); x.stroke();
+    x.setLineDash([]);
+    // dibujitos
+    const circ = (cx, cy, r, c) => { x.fillStyle = c; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); };
+    circ(30, 220, 12, '#6aa84f'); circ(64, 70, 18, '#f6c445'); circ(64, 70, 12, '#fbd978');
+    x.fillStyle = '#3fb8af'; x.beginPath(); x.moveTo(170, 40); x.lineTo(200, 90); x.lineTo(140, 90); x.fill();
+    x.fillStyle = '#f28fad'; x.fillRect(150, 110, 34, 26);
+    circ(90, 170, 10, '#6aa84f'); circ(104, 178, 8, '#58a05a');
+    // gran X del tesoro
+    x.strokeStyle = '#e2553f'; x.lineWidth = 12; x.lineCap = 'round';
+    x.beginPath(); x.moveTo(196, 180); x.lineTo(228, 212); x.moveTo(228, 180); x.lineTo(196, 212); x.stroke();
+    // rosa de los vientos
+    x.fillStyle = '#9a6234'; x.beginPath(); x.moveTo(40, 24); x.lineTo(46, 44); x.lineTo(40, 40); x.lineTo(34, 44); x.fill();
+    // líneas guía de los 4 cuadrantes (puntadas)
+    x.setLineDash([6, 6]); x.strokeStyle = 'rgba(154,98,52,.5)'; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(128, 0); x.lineTo(128, 256); x.moveTo(0, 128); x.lineTo(256, 128); x.stroke(); x.setLineDash([]);
+  }, false);
+}
+// Textura de pizza con cortes radiales (estación 1): partes en grados
+function texPizzaCortes(partes, giro) {
+  return hacerTex(128, 128, (x) => {
+    x.fillStyle = '#e3a35a'; x.fillRect(0, 0, 128, 128);
+    let a = giro;
+    partes.forEach((p, i) => {
+      x.fillStyle = i % 2 ? '#fbd978' : '#f6c445';
+      x.beginPath(); x.moveTo(64, 64); x.arc(64, 64, 64, a * DEG, (a + p) * DEG); x.closePath(); x.fill();
+      a += p;
+    });
+    x.fillStyle = '#e2553f';
+    a = giro; partes.forEach((p) => { const m = (a + p / 2) * DEG; x.beginPath(); x.arc(64 + Math.cos(m) * 36, 64 + Math.sin(m) * 36, 6, 0, TAU); x.fill(); a += p; });
+    x.strokeStyle = '#6b3e26'; x.lineWidth = 5; x.lineCap = 'round';
+    a = giro; partes.forEach((p) => { x.beginPath(); x.moveTo(64, 64); x.lineTo(64 + Math.cos(a * DEG) * 64, 64 + Math.sin(a * DEG) * 64); x.stroke(); a += p; });
+  }, false);
+}
+// Textura de pizza con una línea punteada de corte (estación 2). d = distancia al centro (fracción de R)
+function texPizzaLinea(dFrac, alfa) {
+  return hacerTex(128, 128, (x) => {
+    x.fillStyle = '#f6c445'; x.fillRect(0, 0, 128, 128);
+    x.fillStyle = '#e2553f'; [[40, 40], [86, 36], [92, 88], [36, 86], [64, 22], [22, 64], [106, 64], [64, 106]].forEach(([a, b]) => { x.beginPath(); x.arc(a, b, 6, 0, TAU); x.fill(); });
+    // canvas (px,py) = (64 + 64 x/R, 64 + 64 z/R) en coordenadas locales de la mesa
+    const dx = Math.cos(alfa), dz = Math.sin(alfa), nx = -Math.sin(alfa), nz = Math.cos(alfa);
+    const cx = 64 + nx * dFrac * 64, cz = 64 + nz * dFrac * 64;
+    x.setLineDash([12, 8]); x.strokeStyle = '#6b3e26'; x.lineWidth = 8; x.lineCap = 'round';
+    x.beginPath(); x.moveTo(cx - dx * 80, cz - dz * 80); x.lineTo(cx + dx * 80, cz + dz * 80); x.stroke();
+    x.setLineDash([]); x.fillStyle = '#3f8a3a'; x.beginPath(); x.ellipse(64, 64, 9, 5.5, 0.6, 0, TAU); x.fill(); // centro: hoja de albahaca
+  }, false);
+}
+
+/* ===================== 7. GEOMETRÍA (fusión propia, formas redondeadas, porciones) ===================== */
+const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _s = new V3(), _p = new V3();
+function matriz(x, y, z, rx, ry, rz, sx, sy, sz) {
+  _e.set(rx || 0, ry || 0, rz || 0); _q.setFromEuler(_e);
+  _p.set(x || 0, y || 0, z || 0); _s.set(sx == null ? 1 : sx, sy == null ? (sx == null ? 1 : sx) : sy, sz == null ? (sx == null ? 1 : sx) : sz);
+  return new THREE.Matrix4().compose(_p, _q, _s);
+}
+// Une geometrías (con matriz y color) en una sola BufferGeometry con posición, normal, uv y color
+function fusionar(items) {
+  let n = 0; const pre = [];
+  for (const it of items) {
+    let g = it.g.index ? it.g.toNonIndexed() : it.g.clone();
+    if (it.m) g.applyMatrix4(it.m);
+    if (!g.attributes.normal) g.computeVertexNormals();
+    pre.push({ g, c: it.c }); n += g.attributes.position.count;
+  }
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3);
+  let o = 0; const tmp = new THREE.Color();
+  for (const { g, c } of pre) {
+    const cnt = g.attributes.position.count;
+    pos.set(g.attributes.position.array, o * 3); nor.set(g.attributes.normal.array, o * 3);
+    if (g.attributes.uv) uv.set(g.attributes.uv.array, o * 2);
+    if (g.attributes.color && c == null) col.set(g.attributes.color.array, o * 3);
+    else { tmp.set(c == null ? 0xffffff : c); for (let i = 0; i < cnt; i++) { col[(o + i) * 3] = tmp.r; col[(o + i) * 3 + 1] = tmp.g; col[(o + i) * 3 + 2] = tmp.b; } }
+    o += cnt; g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  out.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  out.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  out.computeBoundingSphere();
+  return out;
+}
+// Colorea por normal: caras hacia arriba = colArriba, resto = colLado
+function colorearPorNormal(g, colArriba, colLado) {
+  g = g.index ? g.toNonIndexed() : g;
+  const n = g.attributes.normal.array, cnt = g.attributes.position.count, col = new Float32Array(cnt * 3);
+  const a = new THREE.Color(colArriba), b = new THREE.Color(colLado);
+  for (let i = 0; i < cnt; i++) { const c = n[i * 3 + 1] > 0.6 ? a : b; col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b; }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); return g;
+}
+// Lote de geometría estática: agrupa por material y fusiona en pocas mallas
+class Lote {
+  constructor() { this.items = {}; }
+  add(mat, g, x, y, z, rx, ry, rz, sx, sy, sz, color) { (this.items[mat] = this.items[mat] || []).push({ g, m: matriz(x, y, z, rx, ry, rz, sx, sy, sz), c: color }); }
+  addM(mat, g, m, color) { (this.items[mat] = this.items[mat] || []).push({ g, m, c: color }); }
+  construir(padre) {
+    const res = {};
+    for (const k in this.items) { const mesh = new THREE.Mesh(fusionar(this.items[k]), M[k]); mesh.matrixAutoUpdate = false; mesh.updateMatrix(); padre.add(mesh); res[k] = mesh; }
+    return res;
+  }
+}
+const CACHE = new Map();
+function cache(clave, crear) { let g = CACHE.get(clave); if (!g) { g = crear(); CACHE.set(clave, g); } return g; }
+// Rectángulo redondeado con bevel (w = ancho X, h = alto Y, d = fondo Z)
+function cajaRedonda(w, h, d, r) {
+  return cache(`cr${w}|${h}|${d}|${r}`, () => {
+    const bt = Math.min(r * 0.6, h * 0.3), bs = bt, ww = w - 2 * bs, dd = d - 2 * bs, cr = Math.max(0.004, Math.min(r - bs * 0.5, ww / 2 - 0.001, dd / 2 - 0.001));
+    const s = new THREE.Shape(), x0 = -ww / 2, y0 = -dd / 2;
+    s.moveTo(x0 + cr, y0); s.lineTo(x0 + ww - cr, y0); s.quadraticCurveTo(x0 + ww, y0, x0 + ww, y0 + cr);
+    s.lineTo(x0 + ww, y0 + dd - cr); s.quadraticCurveTo(x0 + ww, y0 + dd, x0 + ww - cr, y0 + dd);
+    s.lineTo(x0 + cr, y0 + dd); s.quadraticCurveTo(x0, y0 + dd, x0, y0 + dd - cr);
+    s.lineTo(x0, y0 + cr); s.quadraticCurveTo(x0, y0, x0 + cr, y0);
+    const g = new THREE.ExtrudeGeometry(s, { depth: Math.max(0.001, h - 2 * bt), bevelEnabled: true, bevelThickness: bt, bevelSize: bs, bevelSegments: 2, curveSegments: 3 });
+    g.rotateX(-PI / 2); g.translate(0, -(h - 2 * bt) / 2, 0); return g;
+  });
+}
+const geoCaja = () => cache('box', () => new THREE.BoxGeometry(1, 1, 1));
+const geoEsfera = () => cache('esf', () => new THREE.SphereGeometry(1, 12, 9));
+const geoCil = () => cache('cil', () => new THREE.CylinderGeometry(1, 1, 1, 14));
+const geoCil8 = () => cache('cil8', () => new THREE.CylinderGeometry(1, 1, 1, 8));
+const geoCono = () => cache('cono', () => new THREE.ConeGeometry(1, 1, 12));
+function geoToro(R, r, arco) { return cache(`to${R}|${r}|${arco || 0}`, () => new THREE.TorusGeometry(R, r, 6, 16, arco || TAU)); }
+// Porción de pizza: CylinderGeometry con thetaStart/thetaLength + tapas laterales.
+// Bisectriz hacia +Z, origen en el CENTROIDE (así la distancia pieza-ranura es la del centro visual).
+function geoPorcion(angDeg, R, tono, conPepperoni) {
+  return cache(`po${angDeg}|${R}|${tono}|${conPepperoni ? 1 : 0}`, () => {
+    const th = angDeg * DEG, h = 0.035, segs = Math.max(3, Math.round(angDeg / 12));
+    const cil = new THREE.CylinderGeometry(R, R, h, segs, 1, false, -th / 2, th);
+    const lados = new THREE.BufferGeometry();
+    const a1 = -th / 2, a2 = th / 2, p = [];
+    const q = (a) => { const x = R * Math.sin(a), z = R * Math.cos(a); return [0, -h / 2, 0, x, -h / 2, z, x, h / 2, z, 0, -h / 2, 0, x, h / 2, z, 0, h / 2, 0]; };
+    p.push(...q(a1)); const b = q(a2); // invertir orden para que mire hacia afuera
+    p.push(b[0], b[1], b[2], b[6], b[7], b[8], b[3], b[4], b[5], b[9], b[10], b[11], b[15], b[16], b[17], b[12], b[13], b[14]);
+    lados.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); lados.setAttribute('uv', new THREE.Float32BufferAttribute(new Array(24).fill(0), 2)); lados.computeVertexNormals();
+    const cTop = [CONFIG.C.queso, CONFIG.C.queso2, CONFIG.C.dorado][tono || 0];
+    const partes = [{ g: colorearPorNormal(cil, cTop, tono === 2 ? 0xd99a1e : CONFIG.C.corteza) }, { g: lados, c: tono === 2 ? 0xd99a1e : CONFIG.C.corteza }];
+    if (conPepperoni) {
+      const n = Math.max(1, Math.round(angDeg / 45));
+      for (let i = 0; i < n; i++) {
+        const a = -th / 2 + th * (i + 0.5) / n, rr = R * (i % 2 ? 0.45 : 0.68);
+        partes.push({ g: geoCil8(), m: matriz(Math.sin(a) * rr, h / 2 + 0.004, Math.cos(a) * rr, 0, 0, 0, R * 0.13, 0.008, R * 0.13), c: CONFIG.C.tomate });
+      }
+    }
+    const g = fusionar(partes);
+    g.translate(0, h / 2, -centroideSector(th, R)); return g;
+  });
+}
+// Segmento circular (corte recto a distancia d del centro). lado=+1: región x>d ; lado=-1: región x<d
+function geoSegmento(d, R, lado) {
+  return cache(`seg${d.toFixed(3)}|${R}|${lado}`, () => {
+    const al = Math.acos(clamp(d / R, -1, 1)), s = new THREE.Shape();
+    if (lado > 0) s.absarc(0, 0, R, -al, al, false); else s.absarc(0, 0, R, al, TAU - al, false);
+    s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, { depth: 0.035, bevelEnabled: false, curveSegments: 20 });
+    g.rotateX(-PI / 2);
+    return colorearPorNormal(g, CONFIG.C.queso, CONFIG.C.corteza);
+  });
+}
+function geoPlato(R) {
+  return cache(`pl${R}`, () => fusionar([
+    { g: geoCil(), m: matriz(0, 0.01, 0, 0, 0, 0, R, 0.02, R), c: CONFIG.C.crema },
+    { g: geoToro(1, 0.06), m: matriz(0, 0.02, 0, PI / 2, 0, 0, R, R, R), c: CONFIG.C.turquesa }
+  ]));
+}
+function geoPizzaBase(R) {
+  return cache(`pb${R}`, () => fusionar([
+    { g: geoCil(), m: matriz(0, 0.012, 0, 0, 0, 0, R, 0.024, R), c: CONFIG.C.corteza },
+    { g: geoToro(1, 0.12), m: matriz(0, 0.026, 0, PI / 2, 0, 0, R, R, R * 1.4), c: CONFIG.C.corteza }
+  ]));
+}
+function geoAnillo(r) { return cache(`an${r}`, () => { const g = new THREE.TorusGeometry(r, 0.012, 4, 28); g.rotateX(PI / 2); return g; }); }
+
+/* ===================== 8. MATERIALES (compartidos) ===================== */
+const M = {};
+function crearMateriales() {
+  const L = (o) => new THREE.MeshLambertMaterial(o);
+  M.madera = L({ map: TEX.madera, vertexColors: true });
+  M.fieltro = L({ map: TEX.fieltro, vertexColors: true });
+  M.vichy = L({ map: TEX.vichy, vertexColors: true });
+  M.piso = L({ map: TEX.piso, vertexColors: true });
+  M.ladrillo = L({ map: TEX.ladrillo, vertexColors: true });
+  M.liso = L({ vertexColors: true });
+  M.cielo = new THREE.MeshBasicMaterial({ map: TEX.cielo, vertexColors: true });
+  M.sombra = new THREE.MeshBasicMaterial({ color: CONFIG.C.cafe, transparent: true, opacity: 0.22, depthWrite: false });
+  M.anillo = new THREE.MeshBasicMaterial({ color: CONFIG.C.crema, transparent: true, opacity: 0.85 });
+  M.anilloOk = new THREE.MeshBasicMaterial({ color: 0x7fe05a });
+  M.anilloPista = new THREE.MeshBasicMaterial({ color: CONFIG.C.dorado });
+  M.halo = new THREE.MeshBasicMaterial({ color: CONFIG.C.dorado, transparent: true, opacity: 0.8, depthWrite: false });
+  M.fantasma = new THREE.MeshBasicMaterial({ color: 0xe2553f, transparent: true, opacity: 0.5, depthWrite: false });
+  M.fuego = new THREE.MeshBasicMaterial({ color: 0xffa040 });
+  M.dorado = L({ vertexColors: true, emissive: 0x6a4a00 });
+  M.oro = new THREE.MeshBasicMaterial({ color: 0xffd770 });
+  M.mapa = L({ map: TEX.mapa });
+}
+
+/* ===================== 9. SONIDO (Web Audio, máx. 8 nodos simultáneos) ===================== */
+const AUD = { ctx: null, master: null, musica: null, sfx: null, activos: 0, ruido: null, musicaOn: false, tNota: 0, paso: 0, intervalo: null };
+function iniciarAudio() {
+  try {
+    if (AUD.ctx) { AUD.ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    AUD.ctx = new AC();
+    AUD.master = AUD.ctx.createGain(); AUD.master.gain.value = G.mudo ? 0 : 1; AUD.master.connect(AUD.ctx.destination);
+    AUD.musica = AUD.ctx.createGain(); AUD.musica.gain.value = CONFIG.VOL_MUSICA; AUD.musica.connect(AUD.master);
+    AUD.sfx = AUD.ctx.createGain(); AUD.sfx.gain.value = CONFIG.VOL_SFX; AUD.sfx.connect(AUD.master);
+    const len = AUD.ctx.sampleRate; AUD.ruido = AUD.ctx.createBuffer(1, len, AUD.ctx.sampleRate);
+    const d = AUD.ruido.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    AUD.ctx.resume();
+  } catch (e) { AUD.ctx = null; }
+}
+function reservarNodo() { if (!AUD.ctx || AUD.activos >= CONFIG.MAX_NODOS) return false; AUD.activos++; return true; }
+function liberarNodo() { AUD.activos = Math.max(0, AUD.activos - 1); }
+function tono(f0, f1, dur, tipo, vol, destino, retraso) {
+  if (!reservarNodo()) return;
+  try {
+    const c = AUD.ctx, t0 = c.currentTime + (retraso || 0);
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = tipo || 'sine'; o.frequency.setValueAtTime(f0, t0);
+    if (f1 && f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(destino || AUD.sfx); o.start(t0); o.stop(t0 + dur + 0.02);
+    o.onended = () => { liberarNodo(); try { g.disconnect(); } catch (e) { } };
+  } catch (e) { liberarNodo(); }
+}
+function ruido(dur, f0, f1, vol) {
+  if (!reservarNodo()) return;
+  try {
+    const c = AUD.ctx, t0 = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    s.buffer = AUD.ruido; f.type = 'lowpass'; f.frequency.setValueAtTime(f0, t0); f.frequency.exponentialRampToValueAtTime(f1, t0 + dur * 0.6);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + dur * 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    s.connect(f); f.connect(g); g.connect(AUD.sfx); s.start(t0); s.stop(t0 + dur);
+    s.onended = () => { liberarNodo(); try { g.disconnect(); } catch (e) { } };
+  } catch (e) { liberarNodo(); }
+}
+const midi = (n) => 440 * Math.pow(2, (n - 69) / 12);
+function sonar(n) {
+  if (!AUD.ctx || G.mudo) return;
+  try {
+    switch (n) {
+      case 'toc': tono(900, 380, 0.09, 'triangle', 0.5); break;                       // madera
+      case 'plop': tono(320, 110, 0.14, 'sine', 0.45); break;                         // fieltro
+      case 'tic': tono(1400, 1400, 0.04, 'sine', 0.12); break;
+      case 'campana': tono(1320, 1320, 0.7, 'sine', 0.28); tono(1980, 1980, 0.5, 'sine', 0.14, null, 0.02); break;
+      case 'boing': tono(260, 180, 0.3, 'sine', 0.3); break;                          // error suave
+      case 'chop': ruido(0.18, 3000, 600, 0.35); tono(500, 200, 0.1, 'triangle', 0.3); break;
+      case 'fuum': ruido(1.3, 300, 1800, 0.5); break;                                 // horno
+      case 'pop': tono(600, 1200, 0.1, 'sine', 0.3); break;
+      case 'fanfarria': {
+        pararMusica(1.6);
+        [[72, 0], [76, 0.14], [79, 0.28], [84, 0.42], [79, 0.62], [84, 0.76]].forEach(([m, r]) => tono(midi(m), midi(m), r > 0.6 ? 0.6 : 0.2, 'triangle', 0.35, null, r));
+        break;
+      }
+    }
+  } catch (e) { }
+}
+// Música tipo tarantela (6/8, la menor), muy suave
+const MELODIA = [76, 76, 76, 76, 77, 76, 74, 74, 74, 74, 76, 74, 72, 72, 72, 72, 74, 72, 71, 72, 74, 76, -1, -1,
+  72, 72, 72, 72, 74, 72, 71, 71, 71, 71, 72, 71, 69, 69, 69, 69, 71, 72, 74, 72, 71, 69, -1, -1];
+const BAJO = [45, 52, 50, 45, 48, 52, 52, 45, 45, 52, 50, 45, 45, 50, 52, 45];
+let musicaPausaHasta = 0;
+function iniciarMusica() {
+  if (!AUD.ctx || AUD.intervalo) return;
+  AUD.tNota = AUD.ctx.currentTime + 0.2; AUD.paso = 0;
+  AUD.intervalo = setInterval(() => {
+    try {
+      if (!AUD.ctx || G.pausa) { AUD.tNota = AUD.ctx ? AUD.ctx.currentTime + 0.1 : 0; return; }
+      const ahora = AUD.ctx.currentTime;
+      while (AUD.tNota < ahora + 0.25) {
+        const r = AUD.tNota - ahora, i = AUD.paso % MELODIA.length;
+        if (ahora > musicaPausaHasta) {
+          if (MELODIA[i] > 0) tono(midi(MELODIA[i]), midi(MELODIA[i]), 0.16, 'triangle', 0.5, AUD.musica, Math.max(0, r));
+          if (i % 3 === 0) tono(midi(BAJO[(i / 3) % BAJO.length]), midi(BAJO[(i / 3) % BAJO.length]), 0.3, 'sine', 0.7, AUD.musica, Math.max(0, r));
+        }
+        AUD.tNota += 0.16; AUD.paso++;
+      }
+      // baja la música mientras se habla
+      const obj = hablandoHasta > G.t ? CONFIG.VOL_MUSICA * 0.4 : CONFIG.VOL_MUSICA;
+      AUD.musica.gain.setTargetAtTime(obj, ahora, 0.2);
+    } catch (e) { }
+  }, 90);
+}
+function pararMusica(seg) { if (AUD.ctx) musicaPausaHasta = AUD.ctx.currentTime + seg; }
+function setMudo(v) {
+  G.mudo = v; try { if (AUD.master) AUD.master.gain.value = v ? 0 : 1; } catch (e) { }
+  if (v) try { speechSynthesis.cancel(); } catch (e) { }
+  pintarBotonesMudo();
+}
+
+/* ===================== 10. VOZ Y SUBTÍTULOS ===================== */
+const VOZ = { ok: false, voz: null };
+function prepararVoz() {
+  if (!('speechSynthesis' in window)) return;
+  const elegir = () => {
+    try {
+      const vs = speechSynthesis.getVoices();
+      VOZ.voz = vs.find((v) => /^es[-_]PE/i.test(v.lang)) || vs.find((v) => /^es[-_]ES/i.test(v.lang)) ||
+        vs.find((v) => /^es[-_](US|MX|419)/i.test(v.lang)) || vs.find((v) => /^es/i.test(v.lang)) || null;
+      VOZ.ok = !!VOZ.voz;
+    } catch (e) { VOZ.ok = false; }
+  };
+  elegir();
+  try { speechSynthesis.addEventListener('voiceschanged', elegir); } catch (e) { }
+}
+function hablar(texto, quien, alFin) {
+  if (!G.opc.voz || !VOZ.ok || G.mudo) return false;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(texto);
+    u.voice = VOZ.voz; u.lang = VOZ.voz.lang;
+    u.pitch = quien === 'gino' ? 0.7 : quien === 'raton' ? 1.7 : 1.3;
+    u.rate = quien === 'gino' ? 0.88 : 0.95; u.volume = 1;
+    if (alFin) { u.onend = alFin; u.onerror = alFin; }
+    speechSynthesis.speak(u); return true;
+  } catch (e) { return false; }
+}
+let hablandoHasta = 0, hablandoQuien = 'pipo', ultimoDicho = null;
+function mostrarSub(txt, icono, quien) {
+  $('sub').classList.remove('oculto'); $('sub').classList.add('hablando');
+  $('subCara').innerHTML = ICO[quien === 'gino' ? 'gino' : quien === 'raton' ? 'raton' : 'pipo']();
+  $('subTxt').textContent = txt;
+}
+function decir(clave, vars) {
+  const c = CONTENIDO[clave]; if (!c) return Promise.resolve();
+  const quien = c.quien || 'pipo', texto = rellenar(c.voz, vars), sub = rellenar(c.sub, vars);
+  ultimoDicho = { texto, quien };
+  mostrarSub(sub, c.icono, quien);
+  const gen = hiloGen, dur = 0.8 + texto.length * 0.06;
+  hablandoQuien = quien; hablandoHasta = G.t + 60;
+  return new Promise((res) => {
+    let hecho = false;
+    const fin = () => { if (hecho) return; hecho = true; hablandoHasta = 0; $('sub').classList.remove('hablando'); if (gen === hiloGen) res(); };
+    const conVoz = hablar(texto, quien, () => { if (gen === hiloGen) esperas.push({ t: G.t + 0.15, res: fin, gen }); else fin(); });
+    esperas.push({ t: G.t + (conVoz ? dur * 2 + 2 : dur), res: fin, gen });
+  });
+}
+function repetirUltimo() { if (ultimoDicho) { hablar(ultimoDicho.texto, ultimoDicho.quien); $('sub').classList.add('hablando'); setTimeout(() => $('sub').classList.remove('hablando'), 1500); } }
+
+/* ===================== 11. ÍCONOS SVG (hechos por funciones) ===================== */
+const svg = (c, vb) => `<svg viewBox="${vb || '0 0 100 100'}" xmlns="http://www.w3.org/2000/svg">${c}</svg>`;
+function sectores(partes, sombreadas, cx, cy, r, colA, colB) {
+  let a = -90, s = '';
+  partes.forEach((p, i) => {
+    const a1 = a * DEG, a2 = (a + p) * DEG, x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1), x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+    const col = sombreadas && sombreadas.indexOf(i) >= 0 ? colA : colB;
+    s += p >= 360 ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}"/>` :
+      `<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${p > 180 ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${col}" stroke="#6b3e26" stroke-width="3" stroke-linejoin="round"/>`;
+    a += p;
+  });
+  return s;
+}
+function icoPizza(partes, sombreadas) {
+  return svg(`<circle cx="50" cy="50" r="46" fill="#e3a35a"/>${sectores(partes, sombreadas, 50, 50, 38, '#e2553f', '#f6c445')}`);
+}
+const ICO = {
+  pipo: () => svg(`<circle cx="22" cy="40" r="17" fill="#c9b8c4"/><circle cx="22" cy="40" r="10" fill="#f28fad"/><circle cx="78" cy="40" r="17" fill="#c9b8c4"/><circle cx="78" cy="40" r="10" fill="#f28fad"/><ellipse cx="50" cy="60" rx="30" ry="27" fill="#d9cad3"/><rect x="33" y="8" width="34" height="22" rx="10" fill="#fffaf0"/><circle cx="40" cy="12" r="10" fill="#fffaf0"/><circle cx="60" cy="12" r="10" fill="#fffaf0"/><circle cx="40" cy="56" r="5" fill="#3b2418"/><circle cx="60" cy="56" r="5" fill="#3b2418"/><circle cx="50" cy="70" r="6" fill="#f28fad"/><path d="M42 78 Q50 85 58 78" stroke="#3b2418" stroke-width="3" fill="none"/><circle cx="34" cy="70" r="5" fill="#f4a3a8"/><circle cx="66" cy="70" r="5" fill="#f4a3a8"/>`),
+  raton: () => svg(`<circle cx="22" cy="38" r="17" fill="#c9b8c4"/><circle cx="22" cy="38" r="10" fill="#f28fad"/><circle cx="78" cy="38" r="17" fill="#c9b8c4"/><circle cx="78" cy="38" r="10" fill="#f28fad"/><ellipse cx="50" cy="58" rx="30" ry="28" fill="#d9cad3"/><circle cx="40" cy="54" r="5" fill="#3b2418"/><circle cx="60" cy="54" r="5" fill="#3b2418"/><circle cx="50" cy="68" r="6" fill="#f28fad"/><path d="M40 77 Q50 86 60 77" stroke="#3b2418" stroke-width="3" fill="none"/><path d="M28 88 Q50 98 72 88" stroke="#3fb8af" stroke-width="8" fill="none" stroke-linecap="round"/>`),
+  gino: () => svg(`<rect x="28" y="2" width="44" height="30" rx="12" fill="#fffaf0"/><circle cx="34" cy="10" r="12" fill="#fffaf0"/><circle cx="66" cy="10" r="12" fill="#fffaf0"/><circle cx="50" cy="58" r="32" fill="#f2c39b"/><circle cx="38" cy="50" r="4.5" fill="#3b2418"/><circle cx="62" cy="50" r="4.5" fill="#3b2418"/><circle cx="50" cy="62" r="7" fill="#e89a7a"/><path d="M50 70 Q36 66 24 76 Q38 80 50 72 Q62 80 76 76 Q64 66 50 70" fill="#6b3e26"/><circle cx="30" cy="64" r="6" fill="#f4a3a8"/><circle cx="70" cy="64" r="6" fill="#f4a3a8"/>`),
+  mitad: () => icoPizza([180, 180], [0]),
+  tercio: () => icoPizza([120, 120, 120], [0]),
+  cuarto: () => icoPizza([90, 90, 90, 90], [0]),
+  iguales: () => svg(`<circle cx="50" cy="44" r="40" fill="#e3a35a"/>${sectores([90, 90, 90, 90], [0, 2], 50, 44, 32, '#fbd978', '#f6c445')}<rect x="30" y="88" width="40" height="5" rx="2" fill="#6aa84f"/><rect x="30" y="80" width="40" height="5" rx="2" fill="#6aa84f"/>`),
+  entero: () => icoPizza([90, 90, 90, 90], [0, 1, 2, 3]),
+  comparar: () => svg(`<circle cx="28" cy="55" r="24" fill="#fff3dc" stroke="#3fb8af" stroke-width="4"/>${sectores([180, 180], [0], 28, 55, 18, '#f6c445', 'none')}<circle cx="74" cy="55" r="24" fill="#fff3dc" stroke="#3fb8af" stroke-width="4"/>${sectores([90, 270], [0], 74, 55, 18, '#f6c445', 'none')}<path d="M50 20 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#f2b632"/>`),
+  estrella: () => svg(`<path d="M50 6 L62 36 L94 38 L69 58 L78 90 L50 72 L22 90 L31 58 L6 38 L38 36 Z" fill="#f2b632" stroke="#c98b52" stroke-width="4" stroke-linejoin="round"/>`),
+  estrellaGris: () => svg(`<path d="M50 6 L62 36 L94 38 L69 58 L78 90 L50 72 L22 90 L31 58 L6 38 L38 36 Z" fill="#ead2a8" stroke="#c98b52" stroke-width="4" stroke-dasharray="6 5" stroke-linejoin="round"/>`),
+  mapa: () => svg(`<path d="M10 20 L36 10 L64 20 L90 10 L90 80 L64 90 L36 80 L10 90Z" fill="#f6e3b4" stroke="#c98b52" stroke-width="4" stroke-linejoin="round"/><path d="M22 70 Q40 40 60 52 T80 30" stroke="#e2553f" stroke-width="4" stroke-dasharray="6 5" fill="none"/><path d="M70 22 l12 12 M82 22 l-12 12" stroke="#e2553f" stroke-width="5" stroke-linecap="round"/>`),
+  caja: () => svg(`<path d="M12 40 L50 26 L88 40 L88 78 L50 92 L12 78Z" fill="#c98b52"/><path d="M12 40 L50 54 L88 40 M50 54 L50 92" stroke="#9a6234" stroke-width="4" fill="none"/><circle cx="50" cy="24" r="16" fill="#e3a35a"/>${sectores([180, 180], [], 50, 24, 12, '#f6c445', '#f6c445')}`),
+  cuchilla: () => svg(`<path d="M10 62 Q40 30 80 28 L84 40 Q50 46 18 70Z" fill="#e8eef0" stroke="#9fb5bb" stroke-width="3"/><rect x="66" y="56" width="30" height="14" rx="6" transform="rotate(-30 80 62)" fill="#e2553f"/>`),
+  queso: () => svg(`<path d="M10 70 L90 70 L90 40 L10 70Z" fill="#f6c445" stroke="#d9a022" stroke-width="4" stroke-linejoin="round"/><circle cx="66" cy="58" r="5" fill="#fbd978"/><circle cx="80" cy="50" r="4" fill="#fbd978"/>`),
+  ingred: () => svg(`<path d="M6 60 L50 60 L50 38 Z" fill="#f6c445"/><circle cx="72" cy="50" r="22" fill="#f4a3a8" stroke="#e2553f" stroke-width="3"/>`),
+  champi: () => svg(`<path d="M14 52 Q50 0 86 52Z" fill="#e2553f"/><circle cx="36" cy="36" r="5" fill="#fff3dc"/><circle cx="60" cy="30" r="6" fill="#fff3dc"/><rect x="38" y="50" width="24" height="34" rx="10" fill="#e9d6b8"/>`),
+  horno: () => svg(`<path d="M10 80 Q10 20 50 20 Q90 20 90 80Z" fill="#c8643c"/><path d="M32 80 Q32 50 50 50 Q68 50 68 80Z" fill="#6b3e26"/><path d="M42 80 Q50 60 58 80Z" fill="#ffa040"/>`),
+  candado: () => svg(`<path d="M30 46 V32 a20 20 0 0 1 40 0 V46" stroke="#c98b52" stroke-width="9" fill="none"/><rect x="18" y="44" width="64" height="46" rx="12" fill="#f2b632" stroke="#c98b52" stroke-width="4"/><circle cx="50" cy="64" r="7" fill="#9a6234"/>`),
+  ojo: () => svg(`<path d="M6 50 Q50 6 94 50 Q50 94 6 50Z" fill="#fffaf0" stroke="#6b3e26" stroke-width="4"/><circle cx="50" cy="50" r="16" fill="#3fb8af"/><circle cx="50" cy="50" r="7" fill="#3b2418"/>`),
+  brillo: () => svg(`<path d="M50 6 L58 42 L94 50 L58 58 L50 94 L42 58 L6 50 L42 42Z" fill="#f2b632"/>`),
+  migajas: () => svg(`<circle cx="16" cy="76" r="7" fill="#e3a35a"/><circle cx="38" cy="60" r="7" fill="#e3a35a"/><circle cx="58" cy="44" r="7" fill="#e3a35a"/><circle cx="80" cy="26" r="9" fill="#f2b632"/>`),
+  pasos: () => svg(`<ellipse cx="34" cy="64" rx="12" ry="18" fill="#fff3dc"/><circle cx="26" cy="40" r="4" fill="#fff3dc"/><circle cx="34" cy="38" r="4" fill="#fff3dc"/><circle cx="42" cy="40" r="4" fill="#fff3dc"/><ellipse cx="66" cy="40" rx="12" ry="18" fill="#fff3dc"/><circle cx="58" cy="16" r="4" fill="#fff3dc"/><circle cx="66" cy="14" r="4" fill="#fff3dc"/><circle cx="74" cy="16" r="4" fill="#fff3dc"/>`),
+  mesa: () => svg(`<rect x="8" y="36" width="84" height="14" rx="6" fill="#fff3dc"/><rect x="16" y="50" width="9" height="40" rx="3" fill="#fff3dc"/><rect x="75" y="50" width="9" height="40" rx="3" fill="#fff3dc"/><circle cx="50" cy="26" r="14" fill="#f6c445"/>`),
+  volver: () => svg(`<path d="M40 18 L12 44 L40 70 V54 Q70 52 84 80 Q84 34 40 34Z" fill="#fff3dc"/>`),
+  pausa: () => svg(`<rect x="24" y="18" width="18" height="64" rx="6" fill="#fff3dc"/><rect x="58" y="18" width="18" height="64" rx="6" fill="#fff3dc"/>`),
+  play: () => svg(`<path d="M28 14 L84 50 L28 86Z" fill="#fff3dc" stroke="#fff3dc" stroke-width="6" stroke-linejoin="round"/>`),
+  sonido: () => svg(`<path d="M12 38 H30 L52 18 V82 L30 62 H12Z" fill="#fff3dc"/><path d="M64 34 Q74 50 64 66 M74 24 Q90 50 74 76" stroke="#fff3dc" stroke-width="7" fill="none" stroke-linecap="round"/>`),
+  mudo: () => svg(`<path d="M12 38 H30 L52 18 V82 L30 62 H12Z" fill="#fff3dc"/><path d="M64 36 L88 64 M88 36 L64 64" stroke="#fff3dc" stroke-width="8" stroke-linecap="round"/>`),
+  repetir: () => svg(`<path d="M12 38 H28 L46 22 V78 L28 62 H12Z" fill="#fff3dc"/><path d="M58 30 Q80 30 80 50 Q80 70 58 70" stroke="#fff3dc" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M58 60 L50 70 L60 78" fill="none" stroke="#fff3dc" stroke-width="6" stroke-linecap="round"/>`),
+  copiar: () => svg(`<rect x="30" y="8" width="54" height="64" rx="10" fill="#fff3dc" opacity=".7"/><rect x="14" y="26" width="54" height="66" rx="10" fill="#fff3dc"/><path d="M24 46 H58 M24 60 H58 M24 74 H46" stroke="#3fb8af" stroke-width="5" stroke-linecap="round"/>`),
+  otraVez: () => svg(`<path d="M76 32 A32 32 0 1 0 82 56" stroke="#fff3dc" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M62 30 L84 18 L84 44Z" fill="#fff3dc"/>`),
+  reloj: () => svg(`<circle cx="50" cy="52" r="40" fill="#fffaf0" stroke="#c98b52" stroke-width="6"/><path d="M50 52 V28 M50 52 L66 62" stroke="#e2553f" stroke-width="7" stroke-linecap="round"/>`),
+  mano: () => svg(`<path d="M38 92 Q22 70 16 56 Q12 46 22 46 Q28 46 34 58 V18 Q34 8 42 8 Q50 8 50 18 V44 Q50 36 58 36 Q66 36 66 44 V48 Q66 42 74 42 Q82 42 82 52 V70 Q82 84 72 92Z" fill="#fff3dc" stroke="#6b3e26" stroke-width="4" stroke-linejoin="round"/>`),
+  adelante: () => svg(`<path d="M50 14 L86 56 H64 V86 H36 V56 H14Z" fill="#fff3dc"/>`),
+  atras: () => svg(`<path d="M50 86 L86 44 H64 V14 H36 V44 H14Z" fill="#fff3dc"/>`),
+  izq: () => svg(`<path d="M74 70 Q74 30 40 30 V14 L10 40 L40 66 V50 Q56 50 56 70Z" fill="#fff3dc"/>`),
+  der: () => svg(`<path d="M26 70 Q26 30 60 30 V14 L90 40 L60 66 V50 Q44 50 44 70Z" fill="#fff3dc"/>`),
+  lapiz: () => svg(`<path d="M18 82 L24 60 L66 18 L82 34 L40 76Z" fill="#f6c445" stroke="#9a6234" stroke-width="4" stroke-linejoin="round"/><path d="M18 82 L24 60 L40 76Z" fill="#f2c39b"/><path d="M60 24 L76 40" stroke="#e2553f" stroke-width="8"/>`),
+  engrane: () => svg(`<circle cx="50" cy="50" r="22" fill="none" stroke="#fff3dc" stroke-width="12"/>${[0, 45, 90, 135, 180, 225, 270, 315].map((a) => `<rect x="44" y="8" width="12" height="16" rx="3" fill="#fff3dc" transform="rotate(${a} 50 50)"/>`).join('')}`),
+  clic: () => svg(`<path d="M30 14 L30 76 L44 62 L56 88 L66 84 L54 58 L74 58Z" fill="#fffaf0" stroke="#6b3e26" stroke-width="4" stroke-linejoin="round"/>`),
+  efectos: () => svg(`<path d="M30 10 L36 30 L56 36 L36 42 L30 62 L24 42 L4 36 L24 30Z" fill="#f2b632"/><path d="M70 50 L74 64 L88 68 L74 72 L70 86 L66 72 L52 68 L66 64Z" fill="#f28fad"/><path d="M10 90 L90 10" stroke="#e2553f" stroke-width="7" stroke-linecap="round"/>`),
+  vozIco: () => svg(`<path d="M12 38 H30 L52 18 V82 L30 62 H12Z" fill="#3fb8af"/><path d="M64 34 Q74 50 64 66 M74 24 Q90 50 74 76" stroke="#3fb8af" stroke-width="7" fill="none" stroke-linecap="round"/>`),
+  saltar: () => svg(`<path d="M10 20 L48 50 L10 80Z M48 20 L86 50 L48 80Z" fill="#fff3dc"/>`),
+  casa: () => svg(`<path d="M50 12 L90 48 H78 V88 H22 V48 H10Z" fill="#fff3dc"/><rect x="42" y="62" width="16" height="26" fill="#e2553f"/>`),
+  teclas: () => svg(`${[['W', 70, 6], ['A', 14, 62], ['S', 70, 62], ['D', 126, 62]].map(([l, x, y]) => `<rect x="${x}" y="${y}" width="50" height="50" rx="10" fill="#fffaf0" stroke="#9a6234" stroke-width="4"/><text x="${x + 25}" y="${y + 36}" font-size="30" font-weight="bold" text-anchor="middle" fill="#6b3e26" font-family="sans-serif">${l}</text>`).join('')}`, '0 0 190 120'),
+  flechas: () => svg(`${[['▲', 70, 6], ['◀', 14, 62], ['▼', 70, 62], ['▶', 126, 62]].map(([l, x, y]) => `<rect x="${x}" y="${y}" width="50" height="50" rx="10" fill="#fffaf0" stroke="#3fb8af" stroke-width="4"/><text x="${x + 25}" y="${y + 35}" font-size="26" text-anchor="middle" fill="#3fb8af" font-family="sans-serif">${l}</text>`).join('')}`, '0 0 190 120'),
+  raton2: () => ICO.raton()
+};
+
+/* ===================== 12. RENDER, ESCENA Y LUCES ===================== */
+let renderer, scene, camera;
+const LUZ = {};
+const MODESTO = (navigator.hardwareConcurrency || 4) <= 4 || /CrOS/.test(navigator.userAgent);
+function crearRender() {
+  renderer = new THREE.WebGLRenderer({ canvas: $('c'), antialias: !MODESTO, powerPreference: 'default' });
+  G.pr = Math.min(window.devicePixelRatio || 1, MODESTO ? 1 : CONFIG.PR_MAX);
+  renderer.setPixelRatio(G.pr); renderer.setSize(innerWidth, innerHeight, false);
+  renderer.setClearColor(0xf7e2bd);
+  scene = new THREE.Scene(); scene.fog = new THREE.Fog(0xf7e2bd, 16, 30);
+  camera = new THREE.PerspectiveCamera(CONFIG.FOV, innerWidth / innerHeight, 0.05, 40); camera.rotation.order = 'YXZ';
+  scene.add(camera);
+  LUZ.hemi = new THREE.HemisphereLight(0xfff1d6, 0xb4825a, 0.9); scene.add(LUZ.hemi);
+  LUZ.sol = new THREE.DirectionalLight(0xffd08a, 0.7); LUZ.sol.position.set(-5, 7, 6); scene.add(LUZ.sol);
+  LUZ.horno = new THREE.PointLight(0xff9a40, 0.9, 5, 2); LUZ.horno.position.set(2.3, 1.1, -3.7); scene.add(LUZ.horno);
+  LUZ.bodega = new THREE.PointLight(0xffd36a, 0, 7, 2); LUZ.bodega.position.set(6.2, 1.6, 2.4); scene.add(LUZ.bodega);
+}
+
+/* ===================== 13. MUNDO: SALA, MESAS Y DECORADO ===================== */
+const COLISIONES = []; // AABB {x0,x1,z0,z1}
+const MUNDO = {};
+MESAS.forEach((m) => { m.rot = Math.atan2(m.f[0], m.f[1]); m.cos = Math.cos(m.rot); m.sin = Math.sin(m.rot); });
+// Equivale a MESAS[i].grupo.localToWorld (lo verifica el autotest); se usa UNA vez al crear cada estación
+function aMundo(i, lx, lz, out) { const m = MESAS[i]; out.x = m.c[0] + lx * m.cos + lz * m.sin; out.z = m.c[1] - lx * m.sin + lz * m.cos; return out; }
+function aLocal(i, wx, wz, out) { const m = MESAS[i], dx = wx - m.c[0], dz = wz - m.c[1]; out.x = dx * m.cos - dz * m.sin; out.z = dx * m.sin + dz * m.cos; return out; }
+function matMesa(i, x, y, z, rx, ry, rz, sx, sy, sz) {
+  const m = MESAS[i];
+  return new THREE.Matrix4().makeTranslation(m.c[0], 0, m.c[1]).multiply(new THREE.Matrix4().makeRotationY(m.rot)).multiply(matriz(x, y, z, rx, ry, rz, sx, sy, sz));
+}
+function planoUV(w, h, ru, rv) { const g = new THREE.PlaneGeometry(w, h); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * ru, uv.getY(i) * rv); return g; }
+function telaVichy(w, h, k, fu, fv) { // plano con UV en la celda k del atlas
+  const g = new THREE.PlaneGeometry(w, h), uv = g.attributes.uv, v0 = 1 - (k + 1) / 6, v1 = 1 - k / 6;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * fu, v0 + uv.getY(i) * fv * (v1 - v0) * 0.999);
+  return g;
+}
+function aabb(x0, x1, z0, z1) { COLISIONES.push({ x0, x1, z0, z1 }); }
+function crearMundo() {
+  const L = new Lote(), C = CONFIG.C;
+  // Cada mesa es un THREE.Group con origen en el centro del tablero (X local = derecha de la pantalla, Z local = hacia la cámara)
+  MESAS.forEach((m) => { const g = new THREE.Group(); g.position.set(m.c[0], CONFIG.MESA_H, m.c[1]); g.rotation.y = m.rot; scene.add(g); g.updateMatrixWorld(true); m.grupo = g; });
+  // Piso de damas y paredes
+  const piso = planoUV(14, 10, 10, 7.14); piso.rotateX(-PI / 2); L.add('piso', piso, 0, 0, 0);
+  const pared = 0xfbe6c4;
+  L.add('liso', new THREE.PlaneGeometry(14, 3.2), 0, 1.6, -5, 0, 0, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(14, 3.2), 0, 1.6, 5, 0, PI, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(10, 3.2), -7, 1.6, 0, 0, PI / 2, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(6.85, 3.2), 7, 1.6, -1.575, 0, -PI / 2, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(2.05, 3.2), 7, 1.6, 3.975, 0, -PI / 2, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(1.1, 1.1), 7, 2.65, 2.4, 0, -PI / 2, 0, 1, 1, 1, pared);
+  L.add('liso', new THREE.PlaneGeometry(14, 10), 0, 3.2, 0, PI / 2, 0, 0, 1, 1, 1, 0xf3dcb8);
+  for (let i = -2; i <= 2; i++) L.add('madera', geoCaja(), i * 2.8, 3.1, 0, 0, 0, 0, 0.2, 0.2, 10, C.madera2);
+  // zócalo de madera
+  L.add('madera', geoCaja(), 0, 0.5, -4.97, 0, 0, 0, 14, 1, 0.06, C.madera);
+  L.add('madera', geoCaja(), 0, 0.5, 4.97, 0, 0, 0, 14, 1, 0.06, C.madera);
+  L.add('madera', geoCaja(), -6.97, 0.5, 0, 0, 0, 0, 0.06, 1, 10, C.madera);
+  L.add('madera', geoCaja(), 6.97, 0.5, -1.575, 0, 0, 0, 0.06, 1, 6.85, C.madera);
+  L.add('madera', geoCaja(), 6.97, 0.5, 3.975, 0, 0, 0, 0.06, 1, 2.05, C.madera);
+  // ladrillo alrededor del horno
+  L.add('ladrillo', planoUV(3.4, 3.2, 3.4, 3.2), 2.3, 1.6, -4.98, 0, 0, 0, 1, 1, 1, C.ladrillo);
+  // Ventanas (cielo pintado + marco)
+  const ventana = (x, z, ry) => {
+    const m = new THREE.Matrix4().makeTranslation(x, 1.75, z).multiply(new THREE.Matrix4().makeRotationY(ry));
+    const sub = (geo, mat, px, py, pz, sx, sy, sz, col) => L.addM(mat, geo, m.clone().multiply(matriz(px, py, pz, 0, 0, 0, sx, sy, sz)), col);
+    sub(new THREE.PlaneGeometry(1, 1), 'cielo', 0, 0, 0.02, 1.3, 1.1, 1, 0xffffff);
+    sub(geoCaja(), 'madera', 0, 0.6, 0.05, 1.5, 0.1, 0.1, C.madera); sub(geoCaja(), 'madera', 0, -0.6, 0.08, 1.6, 0.1, 0.18, C.madera);
+    sub(geoCaja(), 'madera', -0.7, 0, 0.05, 0.1, 1.3, 0.1, C.madera); sub(geoCaja(), 'madera', 0.7, 0, 0.05, 0.1, 1.3, 0.1, C.madera);
+    sub(geoCaja(), 'madera', 0, 0, 0.05, 0.06, 1.1, 0.06, C.madera); sub(geoCaja(), 'madera', 0, 0, 0.05, 1.3, 0.06, 0.06, C.madera);
+    sub(geoEsfera(), 'fieltro', -0.85, 0.05, 0.1, 0.16, 0.75, 0.06, C.rosa); sub(geoEsfera(), 'fieltro', 0.85, 0.05, 0.1, 0.16, 0.75, 0.06, C.rosa);
+    for (let k = -1; k <= 1; k++) { sub(geoCil(), 'ladrillo', k * 0.45, -0.52, 0.13, 0.09, 0.12, 0.09, C.ladrillo); sub(geoEsfera(), 'fieltro', k * 0.45, -0.38, 0.13, 0.12, 0.1, 0.12, C.hoja); }
+  };
+  ventana(-3, 4.95, PI); ventana(3, 4.95, PI); ventana(-6.95, 0.25, PI / 2); ventana(6.95, -3.9, -PI / 2);
+  // Mesas con manteles vichy
+  MESAS.forEach((ms, i) => {
+    const add = (mat, geo, x, y, z, rx, ry, rz, sx, sy, sz, col) => L.addM(mat, geo, matMesa(i, x, y, z, rx, ry, rz, sx, sy, sz), col);
+    add('madera', cajaRedonda(2.6, 0.06, 1.4, 0.06), 0, 0.91, 0, 0, 0, 0, 1, 1, 1, C.madera);
+    const top = telaVichy(2.64, 1.44, i, 1, 1); top.rotateX(-PI / 2); add('vichy', top, 0, CONFIG.MESA_H, 0);
+    const caida = 0.24;
+    [[0, 0.72, 0], [0, -0.72, PI]].forEach(([x, z, r]) => { const g = telaVichy(2.64, caida, i, 1, 0.18); add('vichy', g, x, CONFIG.MESA_H - caida / 2, z, 0, r, 0); });
+    [[1.32, 0, PI / 2], [-1.32, 0, -PI / 2]].forEach(([x, z, r]) => { const g = telaVichy(1.44, caida, i, 0.55, 0.18); add('vichy', g, x, CONFIG.MESA_H - caida / 2, z, 0, r, 0); });
+    if (i === 1) { // mostrador: cuerpo de madera
+      add('madera', cajaRedonda(2.5, 0.7, 1.3, 0.05), 0, 0.36, 0, 0, 0, 0, 1, 1, 1, C.madera2);
+      add('madera', geoCaja(), 0, 0.36, 0.66, 0, 0, 0, 2.2, 0.08, 0.02, C.queso);
+    } else {
+      [[-1.15, -0.55], [1.15, -0.55], [-1.15, 0.55], [1.15, 0.55]].forEach(([x, z]) => add('madera', geoCil8(), x, 0.36, z, 0, 0, 0, 0.06, 0.72, 0.06, C.madera2));
+    }
+    const sombra = new THREE.CircleGeometry(1, 20); sombra.rotateX(-PI / 2);
+    add('sombra', sombra, 0, 0.005, 0, 0, 0, 0, 1.55, 1, 0.95);
+    // colisión
+    const hx = ms.f[0] !== 0 ? 0.75 : 1.35, hz = ms.f[0] !== 0 ? 1.35 : 0.75;
+    let extra = 0; if (i === 4) extra = 0.75; // banquitos de los ratones
+    aabb(ms.c[0] - hx - (ms.f[0] < 0 ? 0 : 0), ms.c[0] + hx + (ms.f[0] < 0 ? extra : 0), ms.c[1] - hz, ms.c[1] + hz);
+    if (i === 4) for (let k = 0; k < 3; k++) { // banquitos
+      add('madera', geoCil(), -0.6 + k * 0.6, 0.7, -1.0, 0, 0, 0, 0.17, 0.05, 0.17, C.rosa);
+      add('madera', geoCil8(), -0.6 + k * 0.6, 0.35, -1.0, 0, 0, 0, 0.04, 0.7, 0.04, C.madera2);
+    }
+  });
+  // Horno de leña de domo
+  L.add('ladrillo', cajaRedonda(2.0, 0.8, 1.0, 0.08), 2.3, 0.4, -4.5, 0, 0, 0, 1, 1, 1, C.ladrillo);
+  L.add('ladrillo', new THREE.SphereGeometry(0.85, 16, 7, 0, TAU, 0, PI / 2), 2.3, 0.8, -4.5, 0, 0, 0, 1, 1, 0.68, C.ladrillo);
+  L.add('fieltro', new THREE.CircleGeometry(0.34, 14, 0, PI), 2.3, 0.8, -3.92, 0, 0, 0, 1, 1, 1, C.cafe);
+  L.add('ladrillo', geoCil(), 2.3, 2.3, -4.65, 0, 0, 0, 0.16, 1.9, 0.16, C.ladrillo);
+  aabb(1.25, 3.35, -5, -3.95);
+  // Cuadro de Don Gino
+  L.add('madera', cajaRedonda(1.25, 0.08, 1.45, 0.08), 0, 1.95, -4.95, PI / 2, 0, 0, 1, 1, 1, C.dorado);
+  // Repisa con frascos (pared sur)
+  L.add('madera', cajaRedonda(2.2, 0.06, 0.35, 0.03), 0, 1.5, 4.8, 0, 0, 0, 1, 1, 1, C.madera);
+  [C.tomate, C.queso, C.albahaca, C.rosa, C.turquesa].forEach((c, k) => {
+    L.add('fieltro', geoCil(), -0.8 + k * 0.4, 1.66, 4.8, 0, 0, 0, 0.1, 0.26, 0.1, c);
+    L.add('fieltro', geoCil(), -0.8 + k * 0.4, 1.8, 4.8, 0, 0, 0, 0.08, 0.04, 0.08, C.madera2);
+  });
+  // Plantas, sacos de harina y alfombra
+  [[-6.5, 4.5], [6.4, 4.5], [-6.4, -0.9]].forEach(([x, z]) => {
+    L.add('ladrillo', geoCil(), x, 0.22, z, 0, 0, 0, 0.25, 0.44, 0.25, C.ladrillo);
+    L.add('fieltro', geoEsfera(), x, 0.7, z, 0, 0, 0, 0.38, 0.45, 0.38, C.hoja);
+    L.add('fieltro', geoEsfera(), x + 0.1, 0.95, z - 0.05, 0, 0, 0, 0.22, 0.25, 0.22, C.albahaca);
+    aabb(x - 0.4, x + 0.4, z - 0.4, z + 0.4);
+  });
+  [[-6.4, -4.3, 0], [-5.85, -4.45, 0.4], [-6.3, -3.75, -0.3]].forEach(([x, z, r]) => L.add('fieltro', geoEsfera(), x, 0.3, z, 0, r, 0, 0.3, 0.32, 0.26, C.crema));
+  aabb(-7, -5.5, -5, -3.4);
+  const alfombra = new THREE.CircleGeometry(1, 24); alfombra.rotateX(-PI / 2);
+  L.add('fieltro', alfombra, 0, 0.006, 0.8, 0, 0, 0, 2.2, 1, 1.5, C.turquesa);
+  L.add('fieltro', alfombra, 0, 0.009, 0.8, 0, 0, 0, 1.7, 1, 1.1, C.crema);
+  L.add('fieltro', alfombra, 0, 0.012, 0.8, 0, 0, 0, 1.2, 1, 0.75, C.rosa);
+  // Puerta de la bodega: marco y cuarto dorado detrás
+  L.add('madera', geoCaja(), 6.95, 1.1, 1.8, 0, 0, 0, 0.14, 2.2, 0.12, C.madera2);
+  L.add('madera', geoCaja(), 6.95, 1.1, 3.0, 0, 0, 0, 0.14, 2.2, 0.12, C.madera2);
+  L.add('madera', geoCaja(), 6.95, 2.15, 2.4, 0, 0, 0, 0.14, 0.14, 1.32, C.madera2);
+  L.add('liso', new THREE.PlaneGeometry(1.6, 2.4), 8.4, 1.2, 2.4, 0, -PI / 2, 0, 1, 1, 1, 0xffcf6a);
+  L.add('liso', new THREE.PlaneGeometry(1.4, 1.6), 7.7, 0.001, 2.4, -PI / 2, 0, 0, 1, 1, 1, 0xf2b632);
+  L.add('liso', new THREE.PlaneGeometry(1.4, 2.4), 7.7, 1.2, 1.6, 0, 0, 0, 1, 1, 1, 0xffd98a);
+  L.add('liso', new THREE.PlaneGeometry(1.4, 2.4), 7.7, 1.2, 3.2, 0, PI, 0, 1, 1, 1, 0xffd98a);
+  L.add('liso', new THREE.PlaneGeometry(1.4, 1.6), 7.7, 2.2, 2.4, PI / 2, 0, 0, 1, 1, 1, 0xffd98a);
+  MUNDO.estatico = L.construir(scene);
+
+  // Fuego del horno (malla aparte para que parpadee)
+  MUNDO.fuego = new THREE.Mesh(fusionar([
+    { g: geoCono(), m: matriz(2.3, 0.92, -3.98, 0, 0, 0, 0.12, 0.26, 0.05) },
+    { g: geoCono(), m: matriz(2.18, 0.88, -3.99, 0, 0, 0, 0.08, 0.17, 0.04) },
+    { g: geoCono(), m: matriz(2.42, 0.88, -3.99, 0, 0, 0, 0.08, 0.18, 0.04) }]), M.fuego);
+  scene.add(MUNDO.fuego);
+  // Retrato (2 cuadros: boca cerrada / abierta)
+  MUNDO.texRetrato = hacerTex(256, 160, (x) => { dibujarGino(x, 0, false); dibujarGino(x, 128, true); }, false);
+  MUNDO.texRetrato.repeat.set(0.5, 1);
+  MUNDO.retrato = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.25), new THREE.MeshBasicMaterial({ map: MUNDO.texRetrato }));
+  MUNDO.retrato.position.set(0, 1.95, -4.9); scene.add(MUNDO.retrato);
+  // Guirnaldas de banderines (InstancedMesh, decorado fijo)
+  const tri = new THREE.BufferGeometry();
+  tri.setAttribute('position', new THREE.Float32BufferAttribute([-0.13, 0, 0, 0.13, 0, 0, 0, -0.26, 0], 3)); tri.computeVertexNormals();
+  const cuerdas = [[-7, -5, 7, 5], [-7, 5, 7, -5], [-7, 0, 7, 0]], porC = 22;
+  const im = new THREE.InstancedMesh(tri, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide }), cuerdas.length * porC);
+  const cols = [C.tomate, C.queso, C.turquesa, C.rosa, C.albahaca], col = new THREE.Color(); let k = 0;
+  cuerdas.forEach(([x0, z0, x1, z1]) => {
+    const ang = Math.atan2(-(z1 - z0), x1 - x0);
+    for (let i = 0; i < porC; i++) {
+      const t = (i + 0.5) / porC, y = 2.95 - Math.sin(t * PI) * 0.45;
+      im.setMatrixAt(k, matriz(lerp(x0, x1, t), y, lerp(z0, z1, t), 0, ang, 0));
+      im.setColorAt(k, col.set(cols[k % cols.length])); k++;
+    }
+  });
+  scene.add(im); MUNDO.guirnaldas = im;
+  // Candados flotantes sobre estaciones bloqueadas (InstancedMesh)
+  const geoCand = fusionar([{ g: cajaRedonda(0.3, 0.24, 0.1, 0.05), m: matriz(0, 0, 0), c: C.dorado }, { g: geoToro(0.1, 0.028, PI), m: matriz(0, 0.12, 0), c: C.madera2 }]);
+  MUNDO.geoCandado = geoCand;
+  MUNDO.candados = new THREE.InstancedMesh(geoCand, M.fieltro, 6); scene.add(MUNDO.candados);
+  // Puerta de la bodega (pivote) y sus 3 candados
+  MUNDO.pivote = new THREE.Group(); MUNDO.pivote.position.set(6.96, 0, 1.86); scene.add(MUNDO.pivote);
+  const puerta = new THREE.Mesh(fusionar([{ g: cajaRedonda(0.07, 2.08, 1.08, 0.03), m: matriz(0, 1.04, 0.54), c: C.madera2 },
+    { g: geoCaja(), m: matriz(-0.04, 1.5, 0.54, 0, 0, 0, 0.02, 0.5, 0.7), c: C.madera }, { g: geoCaja(), m: matriz(-0.04, 0.6, 0.54, 0, 0, 0, 0.02, 0.6, 0.7), c: C.madera },
+    { g: geoEsfera(), m: matriz(-0.06, 1.0, 0.95, 0, 0, 0, 0.04, 0.04, 0.04), c: C.dorado }]), M.madera);
+  MUNDO.pivote.add(puerta);
+  MUNDO.locks = [1.45, 1.1, 0.75].map((y) => { const l = new THREE.Mesh(geoCand, M.fieltro); l.position.set(6.86, y, 2.4); l.rotation.y = -PI / 2; scene.add(l); return l; });
+  // Marcador de la estación activa: estrella flotante + aro en el piso
+  MUNDO.estrella = new THREE.Mesh(geoEstrella(0.2, 0.05), M.dorado); scene.add(MUNDO.estrella);
+  MUNDO.aro = new THREE.Mesh(geoAnillo(0.55), M.halo); MUNDO.aro.scale.set(1, 1, 1); scene.add(MUNDO.aro);
+  actualizarCandados();
+}
+function dibujarGino(x, ox, boca) {
+  x.save(); x.translate(ox, 0);
+  const g = x.createLinearGradient(0, 0, 0, 160); g.addColorStop(0, '#3fb8af'); g.addColorStop(1, '#9fd8ef');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 160);
+  const c = (cx, cy, r, col) => { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r, 0, TAU); x.fill(); };
+  x.fillStyle = '#6aa84f'; x.beginPath(); x.ellipse(64, 168, 56, 50, 0, 0, TAU); x.fill();
+  x.fillStyle = '#fffaf0'; x.beginPath(); x.moveTo(52, 118); x.lineTo(64, 140); x.lineTo(76, 118); x.fill();
+  c(64, 84, 36, '#f2c39b'); c(30, 84, 8, '#f2c39b'); c(98, 84, 8, '#f2c39b');
+  x.fillStyle = '#fffaf0'; x.fillRect(36, 20, 56, 32); c(42, 26, 16, '#fffaf0'); c(64, 18, 18, '#fffaf0'); c(86, 26, 16, '#fffaf0');
+  c(51, 78, 4.5, '#3b2418'); c(77, 78, 4.5, '#3b2418'); c(64, 90, 8, '#e89a7a'); c(42, 94, 7, '#f4a3a8'); c(86, 94, 7, '#f4a3a8');
+  if (boca) { x.fillStyle = '#a63a28'; x.beginPath(); x.ellipse(64, 110, 9, 7, 0, 0, TAU); x.fill(); }
+  else { x.strokeStyle = '#a63a28'; x.lineWidth = 3; x.beginPath(); x.arc(64, 104, 8, 0.2, PI - 0.2); x.stroke(); }
+  x.fillStyle = '#6b3e26'; x.beginPath(); x.moveTo(64, 100); x.quadraticCurveTo(44, 92, 32, 106); x.quadraticCurveTo(48, 108, 64, 102); x.quadraticCurveTo(80, 108, 96, 106); x.quadraticCurveTo(84, 92, 64, 100); x.fill();
+  x.restore();
+}
+function geoEstrella(R, h) {
+  return cache(`es${R}|${h}`, () => {
+    const s = new THREE.Shape();
+    for (let i = 0; i < 10; i++) { const r = i % 2 ? R * 0.45 : R, a = i * PI / 5 + PI / 2; const px = Math.cos(a) * r, py = Math.sin(a) * r; if (i) s.lineTo(px, py); else s.moveTo(px, py); }
+    s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: true, bevelThickness: h * 0.3, bevelSize: R * 0.06, bevelSegments: 1 });
+    g.translate(0, 0, -h / 2);
+    return colorearPorNormal(g, CONFIG.C.dorado, 0xe0a020);
+  });
+}
+function actualizarCandados() {
+  const m0 = new THREE.Matrix4().makeScale(0, 0, 0);
+  for (let i = 0; i < 6; i++) {
+    const bloq = i > Math.max(G.est, 0) && G.estado !== 'MENU';
+    if (bloq || G.estado === 'MENU' && i > 0) MUNDO.candados.setMatrixAt(i, matriz(MESAS[i].c[0], 1.75, MESAS[i].c[1], 0, MESAS[i].rot, 0, 1.3));
+    else MUNDO.candados.setMatrixAt(i, m0);
+  }
+  MUNDO.candados.instanceMatrix.needsUpdate = true;
+}
+
+/* ===================== 14. PERSONAJES DE FIELTRO ===================== */
+function geoRaton(o) {
+  const C = CONFIG.C, piel = o.piel || 0xd9cad3, p = [];
+  const e = (x, y, z, sx, sy, sz, c, rx, ry, rz) => p.push({ g: geoEsfera(), m: matriz(x, y, z, rx, ry, rz, sx, sy, sz), c });
+  e(-0.06, 0.03, 0.03, 0.05, 0.03, 0.07, C.rosa); e(0.06, 0.03, 0.03, 0.05, 0.03, 0.07, C.rosa);
+  e(0, 0.19, 0, 0.13, 0.15, 0.12, piel); e(0, 0.18, 0.075, 0.085, 0.1, 0.05, C.crema);
+  if (o.delantal) e(0, 0.16, 0.09, 0.1, 0.1, 0.045, C.tomate);
+  e(-0.13, 0.22, 0.03, 0.035, 0.07, 0.035, piel, 0, 0, 0.5); e(0.13, 0.22, 0.03, 0.035, 0.07, 0.035, piel, 0, 0, -0.5);
+  e(0, 0.38, 0.01, 0.115, 0.11, 0.11, piel); e(0, 0.36, 0.1, 0.06, 0.05, 0.07, piel);
+  e(0, 0.37, 0.17, 0.022, 0.022, 0.022, C.rosa); e(-0.045, 0.41, 0.1, 0.017, 0.02, 0.017, C.choco); e(0.045, 0.41, 0.1, 0.017, 0.02, 0.017, C.choco);
+  e(-0.07, 0.355, 0.08, 0.022, 0.018, 0.015, C.jamon); e(0.07, 0.355, 0.08, 0.022, 0.018, 0.015, C.jamon);
+  p.push({ g: geoToro(0.08, 0.014, PI), m: matriz(0, 0.1, -0.17, 0, PI / 2, PI / 2), c: C.rosa });
+  if (o.panuelo) p.push({ g: geoToro(0.085, 0.025), m: matriz(0, 0.29, 0, PI / 2, 0, 0), c: o.panuelo });
+  if (o.lazo) { e(-0.05, 0.5, 0.02, 0.04, 0.03, 0.02, o.lazo); e(0.05, 0.5, 0.02, 0.04, 0.03, 0.02, o.lazo); e(0, 0.5, 0.025, 0.018, 0.018, 0.018, o.lazo); }
+  if (o.gorro) { p.push({ g: geoCil(), m: matriz(0, 0.5, 0, 0, 0, 0, 0.07, 0.08, 0.07), c: 0xfffaf0 }); e(0, 0.56, 0, 0.095, 0.06, 0.095, 0xfffaf0); }
+  if (o.orejas) for (const s of [-1, 1]) { e(s * 0.1, 0.47, -0.01, 0.075, 0.075, 0.02, piel); e(s * 0.1, 0.47, 0.006, 0.05, 0.05, 0.02, C.rosa); }
+  return fusionar(p);
+}
+function geoOreja() {
+  return cache('oreja', () => fusionar([{ g: geoEsfera(), m: matriz(0, 0.05, 0, 0, 0, 0, 0.075, 0.075, 0.02), c: 0xd9cad3 },
+    { g: geoEsfera(), m: matriz(0, 0.05, 0.016, 0, 0, 0, 0.05, 0.05, 0.02), c: CONFIG.C.rosa }]));
+}
+function geoGino() {
+  const C = CONFIG.C, p = [];
+  const e = (x, y, z, sx, sy, sz, c, rz) => p.push({ g: geoEsfera(), m: matriz(x, y, z, 0, 0, rz || 0, sx, sy, sz), c });
+  e(-0.12, 0.05, 0.05, 0.09, 0.06, 0.13, C.cafe); e(0.12, 0.05, 0.05, 0.09, 0.06, 0.13, C.cafe);
+  p.push({ g: geoCil(), m: matriz(-0.11, 0.32, 0, 0, 0, 0, 0.08, 0.5, 0.08), c: C.madera2 });
+  p.push({ g: geoCil(), m: matriz(0.11, 0.32, 0, 0, 0, 0, 0.08, 0.5, 0.08), c: C.madera2 });
+  e(0, 0.86, 0, 0.3, 0.38, 0.25, 0xfffaf0); e(0, 0.8, 0.13, 0.26, 0.32, 0.13, C.albahaca);
+  p.push({ g: geoCil(), m: matriz(-0.34, 0.95, 0, 0, 0, 0.45, 0.06, 0.42, 0.06), c: 0xfffaf0 });
+  p.push({ g: geoCil(), m: matriz(0.34, 0.95, 0, 0, 0, -0.45, 0.06, 0.42, 0.06), c: 0xfffaf0 });
+  e(-0.43, 0.76, 0, 0.065, 0.065, 0.065, C.piel); e(0.43, 0.76, 0, 0.065, 0.065, 0.065, C.piel);
+  p.push({ g: geoToro(0.12, 0.035), m: matriz(0, 1.2, 0, PI / 2, 0, 0), c: C.tomate });
+  e(0, 1.38, 0, 0.2, 0.2, 0.19, C.piel); e(0, 1.36, 0.19, 0.05, 0.045, 0.045, 0xe89a7a);
+  e(-0.07, 1.43, 0.17, 0.024, 0.028, 0.02, C.choco); e(0.07, 1.43, 0.17, 0.024, 0.028, 0.02, C.choco);
+  e(-0.08, 1.31, 0.17, 0.1, 0.04, 0.05, C.cafe, 0.35); e(0.08, 1.31, 0.17, 0.1, 0.04, 0.05, C.cafe, -0.35);
+  e(-0.12, 1.33, 0.14, 0.04, 0.03, 0.02, C.jamon); e(0.12, 1.33, 0.14, 0.04, 0.03, 0.02, C.jamon);
+  p.push({ g: geoCil(), m: matriz(0, 1.62, 0, 0, 0, 0, 0.17, 0.24, 0.17), c: 0xfffaf0 }); e(0, 1.77, 0, 0.23, 0.12, 0.23, 0xfffaf0);
+  return fusionar(p);
+}
+function sombraMalla(r) { const g = cache('sombraC', () => { const c = new THREE.CircleGeometry(1, 16); c.rotateX(-PI / 2); return c; }); const m = new THREE.Mesh(g, M.sombra); m.scale.set(r, 1, r); m.position.y = 0.006; return m; }
+const PJ = {};
+function crearPersonajes() {
+  // Pipo: cuerpo + 2 orejas (se mueven) + sombra
+  const raiz = new THREE.Group(), cuerpo = new THREE.Group();
+  cuerpo.add(new THREE.Mesh(geoRaton({ gorro: true, delantal: true }), M.fieltro));
+  const orejas = [-1, 1].map((s) => { const o = new THREE.Mesh(geoOreja(), M.fieltro); o.position.set(s * 0.1, 0.43, -0.01); o.rotation.z = -s * 0.25; cuerpo.add(o); return o; });
+  raiz.add(cuerpo); raiz.add(sombraMalla(0.16)); scene.add(raiz);
+  PJ.pipo = { raiz, cuerpo, orejas, pos: raiz.position, yaw: 0, fase: 0, modo: 'suelo', quieto: 0, salto: null, gesto: 0, baile: 0 };
+  raiz.position.set(0, 0, 2.6);
+  // Tito, Lola y Beto sentados en la mesa de clientes
+  const cols = [CONFIG.C.turquesa, CONFIG.C.rosa, CONFIG.C.queso];
+  PJ.ratones = cols.map((c, k) => {
+    const m = new THREE.Mesh(geoRaton({ panuelo: c, orejas: true, lazo: k === 1 ? CONFIG.C.rosa : null, piel: k === 2 ? 0xe2c6b4 : 0xd9cad3 }), M.fieltro);
+    const v = aMundo(4, -0.6 + k * 0.6, -1.0, new V3()); m.position.set(v.x, 0.725, v.z); m.rotation.y = MESAS[4].rot;
+    m.scale.setScalar(1.15); scene.add(m); return { m, base: 0.725, salto: 0 };
+  });
+  // Don Gino (aparece al final)
+  PJ.gino = new THREE.Mesh(geoGino(), M.fieltro); PJ.gino.visible = false; scene.add(PJ.gino);
+  PJ.ginoSombra = sombraMalla(0.35); PJ.ginoSombra.visible = false; scene.add(PJ.ginoSombra);
+}
+
+/* ===================== 15. EFECTOS: partículas, migajas, halos, demos ===================== */
+const PART = { n: CONFIG.MAX_PARTICULAS, limite: CONFIG.MAX_PARTICULAS, sig: 0 };
+function crearParticulas() {
+  const n = PART.n;
+  PART.pos = new Float32Array(n * 3); PART.col = new Float32Array(n * 3); PART.vel = new Float32Array(n * 3); PART.vida = new Float32Array(n);
+  for (let i = 0; i < n; i++) PART.pos[i * 3 + 1] = -50;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(PART.pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(PART.col, 3));
+  PART.geo = g;
+  PART.obj = new THREE.Points(g, new THREE.PointsMaterial({ size: 0.07, map: TEX.punto, vertexColors: true, transparent: true, depthWrite: false, alphaTest: 0.05 }));
+  PART.obj.frustumCulled = false; scene.add(PART.obj);
+  // migajas (camino de pista 2)
+  MIG.pos = new Float32Array(18 * 3); for (let i = 0; i < 18; i++) MIG.pos[i * 3 + 1] = -50;
+  const gm = new THREE.BufferGeometry(); gm.setAttribute('position', new THREE.BufferAttribute(MIG.pos, 3));
+  MIG.obj = new THREE.Points(gm, new THREE.PointsMaterial({ size: 0.05, map: TEX.punto, color: 0xd98a3a, transparent: true, depthWrite: false, alphaTest: 0.05 }));
+  MIG.obj.frustumCulled = false; MIG.obj.visible = false; scene.add(MIG.obj);
+}
+const _col = new THREE.Color();
+const PALETA_CONFETI = [0xf6c445, 0xe2553f, 0x6aa84f, 0xf28fad, 0x3fb8af, 0xf2b632];
+function chispas(x, y, z, n, fuerza) {
+  if (G.opc.menosEfectos) n = Math.ceil(n / 5);
+  n = Math.min(n, PART.limite);
+  for (let k = 0; k < n; k++) {
+    const i = PART.sig; PART.sig = (PART.sig + 1) % PART.limite;
+    PART.pos[i * 3] = x; PART.pos[i * 3 + 1] = y; PART.pos[i * 3 + 2] = z;
+    const a = Math.random() * TAU, f = (fuerza || 1) * rnd(0.6, 1.6);
+    PART.vel[i * 3] = Math.cos(a) * f; PART.vel[i * 3 + 1] = rnd(1.5, 3.2) * (fuerza || 1); PART.vel[i * 3 + 2] = Math.sin(a) * f;
+    PART.vida[i] = rnd(0.8, 1.4);
+    _col.set(PALETA_CONFETI[k % PALETA_CONFETI.length]); PART.col[i * 3] = _col.r; PART.col[i * 3 + 1] = _col.g; PART.col[i * 3 + 2] = _col.b;
+  }
+  PART.geo.attributes.color.needsUpdate = true;
+}
+function actualizarParticulas(dt) {
+  let viva = false;
+  for (let i = 0; i < PART.n; i++) {
+    if (PART.vida[i] <= 0) continue;
+    viva = true; PART.vida[i] -= dt;
+    if (PART.vida[i] <= 0 || i >= PART.limite) { PART.vida[i] = 0; PART.pos[i * 3 + 1] = -50; continue; }
+    PART.vel[i * 3 + 1] -= 6 * dt;
+    PART.pos[i * 3] += PART.vel[i * 3] * dt; PART.pos[i * 3 + 1] += PART.vel[i * 3 + 1] * dt; PART.pos[i * 3 + 2] += PART.vel[i * 3 + 2] * dt;
+  }
+  if (viva || PART.sucio) { PART.geo.attributes.position.needsUpdate = true; PART.sucio = viva; }
+}
+const MIG = {};
+function mostrarMigajas(a, b) {
+  for (let i = 0; i < 18; i++) {
+    const t = (i + 0.5) / 18;
+    MIG.pos[i * 3] = lerp(a.x, b.x, t) + Math.sin(t * 9) * 0.02; MIG.pos[i * 3 + 1] = CONFIG.MESA_H + 0.02; MIG.pos[i * 3 + 2] = lerp(a.z, b.z, t) + Math.cos(t * 9) * 0.02;
+  }
+  MIG.obj.geometry.attributes.position.needsUpdate = true; MIG.obj.visible = true;
+}
+function ocultarMigajas() { if (MIG.obj) MIG.obj.visible = false; }
+
+// Halos (selección y pista) y piscinas de porciones para demos/comparaciones
+const FX = {};
+function crearEfectos() {
+  const geoHalo = new THREE.TorusGeometry(1, 0.07, 4, 32); geoHalo.rotateX(PI / 2);
+  const halo = () => { const m = new THREE.Mesh(geoHalo, M.halo); m.visible = false; scene.add(m); return m; };
+  FX.haloSel = halo(); FX.haloPista = halo();
+  FX.demo = [];
+  for (let i = 0; i < 6; i++) { const m = new THREE.Mesh(geoPorcion(90, 0.2, 0, true), M.fieltro); m.visible = false; scene.add(m); FX.demo.push(m); }
+  FX.fantasma = new THREE.Mesh(geoPorcion(90, 0.2, 0, false), M.fantasma); FX.fantasma.visible = false; FX.fantasma.renderOrder = 2; scene.add(FX.fantasma);
+  FX.solida = new THREE.Mesh(geoPorcion(90, 0.2, 0, true), M.fieltro); FX.solida.visible = false; scene.add(FX.solida);
+  FX.segA = new THREE.Mesh(geoSegmento(0, 0.21, 1), M.fantasma); FX.segA.visible = false; FX.segA.renderOrder = 2; scene.add(FX.segA);
+  FX.segB = new THREE.Mesh(geoSegmento(0, 0.21, -1), M.fieltro); FX.segB.visible = false; scene.add(FX.segB);
+  FX.escenario = new THREE.Mesh(geoPlato(1), M.fieltro); FX.escenario.visible = false; scene.add(FX.escenario);
+}
+// Plato crema flotante detrás de las demostraciones (contraste)
+function escenario(c, y, R, on) {
+  const e = FX.escenario; e.visible = on; if (!on) return;
+  e.position.set(c.x, y - 0.03, c.z); e.scale.set(R * 1.5, 1, R * 1.5);
+}
+function ponerHalo(h, x, z, r, y) { h.visible = true; h.position.set(x, y || CONFIG.MESA_H + 0.01, z); h.userData.r = r; h.scale.setScalar(r); }
+// VER / ENTENDER: una pizza aparece, sus partes se separan y luego se superponen (mismo tamaño)
+async function separarSuperponer(angulos, centro, R, rotBase, altura) {
+  const n = angulos.length, y0 = centro.y + (altura || 0.3), tot = angulos.reduce((a, b) => a + b, 0);
+  const max = Math.max(...angulos), fases = [];
+  let a = -tot / 2;
+  for (let i = 0; i < n; i++) {
+    const m = FX.demo[i], th = angulos[i] * DEG, phi = (a + angulos[i] / 2) * DEG;
+    m.geometry = geoPorcion(angulos[i], R, i % 2, true); m.visible = true;
+    const dc = centroideSector(th, R), w = rotBase + phi;
+    const ini = { x: centro.x + Math.sin(w) * dc, z: centro.z + Math.cos(w) * dc, r: w };
+    const sep = { x: ini.x + Math.sin(w) * 0.11, z: ini.z + Math.cos(w) * 0.11 };
+    const phiS = rotBase + (-max / 2 + angulos[i] / 2) * DEG; // todas alineadas en el mismo borde
+    const fin = { x: centro.x + Math.sin(phiS) * dc, z: centro.z + Math.cos(phiS) * dc, r: phiS, y: y0 + 0.02 + i * 0.03 };
+    fases.push({ m, ini, sep, fin }); a += angulos[i];
+  }
+  sonar('pop'); escenario(centro, y0, R + 0.1, true);
+  await animarP(0.45, (k) => fases.forEach((f) => { f.m.position.set(f.ini.x, y0, f.ini.z); f.m.rotation.set(0, f.ini.r, 0); f.m.scale.setScalar(Math.max(0.01, k)); }), EASE.back);
+  await animarP(0.6, (k) => fases.forEach((f) => { f.m.position.set(lerp(f.ini.x, f.sep.x, k), y0, lerp(f.ini.z, f.sep.z, k)); }));
+  sonar('plop');
+  await animarP(0.9, (k) => fases.forEach((f) => {
+    f.m.position.set(lerp(f.sep.x, f.fin.x, k), lerp(y0, f.fin.y, k) + Math.sin(k * PI) * 0.12, lerp(f.sep.z, f.fin.z, k)); f.m.rotation.y = lerp(f.ini.r, f.fin.r, k);
+  }));
+  sonar('campana'); await esperar(1.0);
+  await animarP(0.3, (k) => fases.forEach((f) => f.m.scale.setScalar(Math.max(0.01, 1 - k))));
+  fases.forEach((f) => { f.m.visible = false; f.m.scale.setScalar(1); }); escenario(centro, 0, 0, false);
+}
+// ERROR: superpone dos porciones (fantasma = referencia, sólida = elegida) alineadas por el vértice y un borde
+async function compararPartes(angRef, angElegida, centro, R, rotBase) {
+  const y0 = centro.y + 0.3, max = Math.max(angRef, angElegida); escenario(centro, y0, R, true);
+  const colocar = (m, ang, y) => {
+    const th = ang * DEG, phi = rotBase + (-max / 2 + ang / 2) * DEG, dc = centroideSector(th, R);
+    m.position.set(centro.x + Math.sin(phi) * dc, y, centro.z + Math.cos(phi) * dc); m.rotation.set(0, phi, 0);
+  };
+  FX.fantasma.geometry = geoPorcion(angRef, R, 0, false); FX.solida.geometry = geoPorcion(angElegida, R, 0, true);
+  colocar(FX.fantasma, angRef, y0 + 0.045); colocar(FX.solida, angElegida, y0);
+  FX.fantasma.visible = FX.solida.visible = true;
+  await animarP(0.35, (k) => { FX.fantasma.scale.setScalar(Math.max(0.01, k)); FX.solida.scale.setScalar(Math.max(0.01, k)); }, EASE.back);
+  await esperar(1.8);
+  await animarP(0.25, (k) => { FX.fantasma.scale.setScalar(Math.max(0.01, 1 - k)); FX.solida.scale.setScalar(Math.max(0.01, 1 - k)); });
+  FX.fantasma.visible = FX.solida.visible = false; escenario(centro, 0, 0, false);
+}
+// ERROR en estación 2: superpone los dos segmentos de un corte recto (cuerda a distancia d)
+async function compararSegmentos(d, R, centro, rot) {
+  const y0 = centro.y + 0.3, ax = Math.cos(rot), az = -Math.sin(rot); escenario(centro, y0, R, true);
+  FX.segA.geometry = geoSegmento(d, R, -1); FX.segB.geometry = geoSegmento(d, R, 1);
+  // ambos con la cuerda en el mismo lugar y el arco hacia el mismo lado
+  FX.segB.rotation.set(0, rot, 0); FX.segB.position.set(centro.x - d * ax, y0, centro.z - d * az);
+  FX.segA.rotation.set(0, rot + PI, 0); FX.segA.position.set(centro.x + d * ax, y0 + 0.05, centro.z + d * az);
+  FX.segA.visible = FX.segB.visible = true;
+  await animarP(0.35, (k) => { FX.segA.scale.setScalar(Math.max(0.01, k)); FX.segB.scale.setScalar(Math.max(0.01, k)); }, EASE.back);
+  await esperar(1.8);
+  await animarP(0.25, (k) => { FX.segA.scale.setScalar(Math.max(0.01, 1 - k)); FX.segB.scale.setScalar(Math.max(0.01, 1 - k)); });
+  FX.segA.visible = FX.segB.visible = false; escenario(centro, 0, 0, false);
+}
+// Mano animada (HTML) que muestra cómo arrastrar: de un punto 3D a otro
+const _pm = new V3();
+function proyectar(x, y, z) { _pm.set(x, y, z).project(camera); return { x: (_pm.x * 0.5 + 0.5) * innerWidth, y: (-_pm.y * 0.5 + 0.5) * innerHeight }; }
+async function manoDemo(a, b) {
+  const el = $('mano'); el.innerHTML = ICO.mano(); const y = CONFIG.MESA_H + 0.05;
+  const mover = (x, z, s) => { _pm.set(x, y, z).project(camera); el.style.transform = `translate(${(_pm.x * 0.5 + 0.5) * innerWidth - 20}px,${(-_pm.y * 0.5 + 0.5) * innerHeight - 6}px) scale(${s})`; };
+  await animarP(0.35, (k) => mover(a.x, a.z, 1.3 - 0.3 * k));
+  await animarP(1.3, (k) => mover(lerp(a.x, b.x, k), lerp(a.z, b.z, k), 1));
+  await animarP(0.35, (k) => mover(b.x, b.z, 1 + 0.3 * k));
+  el.style.transform = 'translate(-200px,-200px)';
+}
+// NOMBRAR: letras de fieltro + Pipo dice la palabra
+async function nombrar(clavePalabra, claveVoz) {
+  const p = PALABRAS[clavePalabra], el = $('nombreFieltro');
+  let html = '';
+  [...p.txt].forEach((ch, i) => { html += ch === ' ' ? '<span class="letra esp"> </span>' : `<span class="letra" style="animation-delay:${i * 0.08}s">${ch}</span>`; });
+  if (p.frac) html += `<span class="fraccion"><span>${p.frac[0]}</span><i></i><span>${p.frac[1]}</span></span>`;
+  el.innerHTML = html; el.classList.remove('oculto');
+  sonar('campana'); confetiFrente(40);
+  pipoGesto('celebra');
+  await decir(claveVoz); await esperar(1.0);
+  el.classList.add('oculto');
+}
+
+/* ===================== 16. JUGADOR, CÁMARA Y MODO MESA ===================== */
+const JUG = { x: 0, z: 3.9, yaw: 0, pitch: 0, mov: false, quieto: 0, auto: false, autoT: 0, suprimir: false, paso: 0, ultX: 0, ultZ: 0 };
+const TECLAS = {}, PAD = { adelante: false, atras: false, izq: false, der: false };
+function colisiona(x, z) {
+  const r = CONFIG.RADIO_JUG;
+  if (x < -CONFIG.SALA.x || x > CONFIG.SALA.x || z < -CONFIG.SALA.z || z > CONFIG.SALA.z) return true;
+  for (let i = 0; i < COLISIONES.length; i++) { const b = COLISIONES[i]; if (x > b.x0 - r && x < b.x1 + r && z > b.z0 - r && z < b.z1 + r) return true; }
+  return false;
+}
+function moverCon(dx, dz) { // colisión simple con deslizamiento
+  if (!colisiona(JUG.x + dx, JUG.z)) JUG.x += dx;
+  if (!colisiona(JUG.x, JUG.z + dz)) JUG.z += dz;
+}
+function puntoAcercamiento(i, out) { return aMundo(i, 0, 1.75, out); }
+const _ap = new V3(), _ap2 = new V3();
+function puedeCaminar() { return G.modo === 'caminar' && !G.pausa && (G.estado === 'TUTORIAL' || G.estado.startsWith('EST')); }
+function actualizarJugador(dt) {
+  if (G.modo === 'menu') { // cámara orbitando para el menú
+    const a = G.t * 0.12; camera.position.set(Math.sin(a) * 4.2, 2.5, Math.cos(a) * 3.2 + 0.4); camera.lookAt(0, 1.0, 0); return;
+  }
+  if (G.modo !== 'caminar') return;
+  JUG.mov = false;
+  if (puedeCaminar() && G.est >= 0) {
+    puntoAcercamiento(G.est, _ap);
+    if (JUG.auto) { // camino automático hacia la mesa activa
+      const dx = _ap.x - JUG.x, dz = _ap.z - JUG.z, d = Math.hypot(dx, dz);
+      const yawObj = Math.atan2(-dx, -dz); let dy = yawObj - JUG.yaw; while (dy > PI) dy -= TAU; while (dy < -PI) dy += TAU;
+      JUG.yaw += clamp(dy, -3 * dt, 3 * dt); JUG.pitch = lerp(JUG.pitch, 0, 0.1);
+      if (d > 0.2) { const v = Math.min(CONFIG.VEL * dt, d); const x0 = JUG.x, z0 = JUG.z; moverCon(dx / d * v, dz / d * v); JUG.mov = true; if (Math.hypot(JUG.x - x0, JUG.z - z0) < v * 0.2) JUG.autoT += dt; else JUG.autoT = 0; }
+      if (d <= 0.25 || JUG.autoT > 1.0) { JUG.auto = false; JUG.x = _ap.x; JUG.z = _ap.z; entrarMesa(); }
+    } else {
+      const f = (TECLAS.KeyW || PAD.adelante ? 1 : 0) - (TECLAS.KeyS || PAD.atras ? 1 : 0);
+      const s = (TECLAS.KeyD ? 1 : 0) - (TECLAS.KeyA ? 1 : 0);
+      const giro = (TECLAS.ArrowLeft || PAD.izq ? 1 : 0) - (TECLAS.ArrowRight || PAD.der ? 1 : 0);
+      const incl = (TECLAS.ArrowUp ? 1 : 0) - (TECLAS.ArrowDown ? 1 : 0);
+      JUG.yaw += giro * CONFIG.GIRO * dt;
+      JUG.pitch = clamp(JUG.pitch + incl * 1.2 * dt, -CONFIG.PITCH_MAX * DEG, CONFIG.PITCH_MAX * DEG);
+      if (f || s) {
+        const sy = Math.sin(JUG.yaw), cy = Math.cos(JUG.yaw);
+        let vx = -sy * f + cy * s, vz = -cy * f - sy * s; const l = Math.hypot(vx, vz);
+        vx = vx / l * CONFIG.VEL * dt; vz = vz / l * CONFIG.VEL * dt; moverCon(vx, vz); JUG.mov = true;
+      }
+      const dAp = Math.hypot(_ap.x - JUG.x, _ap.z - JUG.z);
+      if (JUG.suprimir && dAp > 1.6) JUG.suprimir = false;
+      if (!JUG.suprimir && dAp < 0.9 && G.estacionLista) entrarMesa();
+    }
+  }
+  JUG.quieto = JUG.mov ? 0 : JUG.quieto + dt;
+  if (JUG.mov) JUG.paso += dt * 9;
+  camera.position.set(JUG.x, CONFIG.OJOS + (JUG.mov ? Math.abs(Math.sin(JUG.paso)) * 0.025 : 0), JUG.z);
+  camera.rotation.set(JUG.pitch, JUG.yaw, 0);
+}
+// Vista fija de la mesa: inclinada 40° hacia abajo y viéndola entera (se busca la distancia mínima)
+const camTmp = new THREE.PerspectiveCamera(), vistas = {};
+function vistaMesa(i) {
+  const clave = i + '|' + camera.aspect.toFixed(3);
+  if (vistas[clave]) return vistas[clave];
+  camTmp.fov = CONFIG.FOV; camTmp.aspect = camera.aspect; camTmp.near = 0.05; camTmp.far = 40; camTmp.updateProjectionMatrix();
+  const m = MESAS[i], fx = m.f[0], fz = m.f[1], cp = Math.cos(CONFIG.PITCH_MESA * DEG), sp = Math.sin(CONFIG.PITCH_MESA * DEG);
+  const loc = [[-1.3, 0, -0.7], [1.3, 0, -0.7], [-1.3, 0, 0.7], [1.3, 0, 0.7], [-1.08, 0.62, -0.48], [0, 0.2, -0.7], [1.3, 0.15, -0.7]];
+  const pts = loc.map(([x, y, z]) => { const w = aMundo(i, x, z, new V3()); w.y = CONFIG.MESA_H + y; return w; });
+  let mejor = null; const t = new V3(), q = new V3();
+  for (const s of [0.12, 0.05, 0.2, 0]) {
+    for (let D = 1.3; D < 5; D += 0.04) {
+      t.set(m.c[0] + fx * s, CONFIG.MESA_H, m.c[1] + fz * s);
+      camTmp.position.set(t.x + fx * cp * D, t.y + sp * D, t.z + fz * cp * D); camTmp.lookAt(t); camTmp.updateMatrixWorld();
+      let ok = true;
+      for (const p of pts) { q.copy(p).project(camTmp); if (Math.abs(q.x) > 0.9 || q.y < -0.64 || q.y > 0.74) { ok = false; break; } }
+      if (ok) { if (!mejor || D < mejor.D) mejor = { D, pos: camTmp.position.clone(), quat: camTmp.quaternion.clone() }; break; }
+    }
+  }
+  if (!mejor) { camTmp.position.set(m.c[0] + fx * 2.6, 3.2, m.c[1] + fz * 2.6); camTmp.lookAt(m.c[0], CONFIG.MESA_H, m.c[1]); mejor = { D: 3.4, pos: camTmp.position.clone(), quat: camTmp.quaternion.clone() }; }
+  vistas[clave] = mejor; return mejor;
+}
+const _qa = new THREE.Quaternion(), _qb = new THREE.Quaternion(), _pa = new V3(), _pb = new V3();
+let animCam = null;
+function moverCamara(pos, quat, dur) {
+  cancelarAnim(animCam);
+  _pa.copy(camera.position); _qa.copy(camera.quaternion); const pb = pos.clone(), qb = quat.clone();
+  return new Promise((res) => { animCam = animar(dur, (k) => { camera.position.lerpVectors(_pa, pb, k); camera.quaternion.copy(_qa).slerp(qb, k); }, EASE.suave, res); });
+}
+async function entrarMesa() {
+  if (G.modo !== 'caminar' || G.est < 0 || !G.estacionLista) return;
+  G.modo = 'trans'; JUG.auto = false;
+  puntoAcercamiento(G.est, _ap); JUG.x = _ap.x; JUG.z = _ap.z;
+  const m = MESAS[G.est]; JUG.yaw = Math.atan2(m.f[0], m.f[1]); JUG.pitch = 0;
+  actualizarUI();
+  pipoAMesa();
+  const v = vistaMesa(G.est);
+  await moverCamara(v.pos, v.quat, CONFIG.T_CAMARA);
+  G.modo = 'mesa'; actualizarUI(); emitir('mesa');
+}
+async function salirMesa() {
+  if (G.modo !== 'mesa') return;
+  cancelarArrastre(true); deseleccionar();
+  G.modo = 'trans'; actualizarUI();
+  pipoAlSuelo();
+  _qb.setFromEuler(new THREE.Euler(0, JUG.yaw, 0, 'YXZ'));
+  await moverCamara(new V3(JUG.x, CONFIG.OJOS, JUG.z), _qb, CONFIG.T_CAMARA);
+  G.modo = 'caminar'; JUG.suprimir = true; actualizarUI();
+}
+function irALaMesa() { // botón "Mesa": camina solo hasta la mesa activa
+  if (G.modo === 'caminar' && G.est >= 0 && G.estacionLista) { JUG.auto = true; JUG.autoT = 0; JUG.suprimir = false; }
+}
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight, false);
+  if (G.modo === 'mesa' && G.est >= 0) { const v = vistaMesa(G.est); camera.position.copy(v.pos); camera.quaternion.copy(v.quat); }
+});
+
+/* ===================== 17. PIPO: guía que camina delante, mira y vuelve ===================== */
+const _v1 = new V3(), _v2 = new V3();
+function puntoPipoSuelo(i, out) { aMundo(i, -1.0, 1.2, out); out.y = 0; return out; }
+function puntoPipoMesa(i, out) { aMundo(i, -1.08, -0.48, out); out.y = CONFIG.MESA_H; return out; }
+function pipoSaltar(dest, dur, modoFinal) {
+  const P = PJ.pipo; cancelarAnim(P.salto); P.modo = 'salto';
+  const a = P.pos.clone(), b = dest.clone(), alto = Math.max(a.y, b.y) + 0.45;
+  const yaw0 = P.yaw, yaw1 = Math.atan2(b.x - a.x, b.z - a.z) || yaw0;
+  P.salto = animar(dur, (k) => {
+    P.pos.set(lerp(a.x, b.x, k), lerp(a.y, b.y, k) + Math.sin(k * PI) * (alto - Math.max(a.y, b.y) + 0.1), lerp(a.z, b.z, k));
+    P.yaw = yaw0 + (yaw1 - yaw0) * Math.min(1, k * 3);
+  }, EASE.lineal, () => { P.modo = modoFinal; P.salto = null; sonar('plop'); });
+}
+function pipoAMesa() { if (G.est >= 0) pipoSaltar(puntoPipoMesa(G.est, _v1), 0.6, 'mesa'); }
+function pipoAlSuelo() { if (G.est >= 0) pipoSaltar(puntoPipoSuelo(G.est, _v1), 0.6, 'suelo'); }
+function pipoGesto(g) { PJ.pipo.gesto = g === 'celebra' ? 1.4 : 0.9; PJ.pipo.tipoGesto = g; }
+let tVuelve = 0;
+function actualizarPipo(dt) {
+  const P = PJ.pipo; P.fase += dt;
+  let moviendo = false;
+  if (P.modo === 'suelo' && G.est >= 0 && (G.estado === 'TUTORIAL' || G.estado.startsWith('EST'))) {
+    puntoAcercamiento(G.est, _v1); puntoPipoSuelo(G.est, _v2);
+    const dPT = Math.hypot(_v1.x - JUG.x, _v1.z - JUG.z), dPP = Math.hypot(P.pos.x - JUG.x, P.pos.z - JUG.z);
+    let tx, tz;
+    if (dPT < 3.0) { tx = _v2.x; tz = _v2.z; }
+    else { const lead = Math.min(2.6, dPT); tx = JUG.x + (_v1.x - JUG.x) / dPT * lead; tz = JUG.z + (_v1.z - JUG.z) / dPT * lead; }
+    if (dPP > 5) { tx = JUG.x + (P.pos.x - JUG.x) / dPP * 1.2; tz = JUG.z + (P.pos.z - JUG.z) / dPP * 1.2; if (G.t > tVuelve && G.modo === 'caminar') { tVuelve = G.t + 14; if (!hablandoHasta) decir('vuelve'); } }
+    const dx = tx - P.pos.x, dz = tz - P.pos.z, d = Math.hypot(dx, dz);
+    if (d > 0.15) {
+      const v = Math.min(2.7 * dt, d); P.pos.x += dx / d * v; P.pos.z += dz / d * v;
+      P.pos.x = clamp(P.pos.x, -6.6, 6.6); P.pos.z = clamp(P.pos.z, -4.6, 4.6);
+      girarPipo(Math.atan2(dx, dz), dt * 8); moviendo = true;
+    } else if (JUG.quieto > 0.5 || dPT < 3.0) girarPipo(Math.atan2(JUG.x - P.pos.x, JUG.z - P.pos.z), dt * 5); // voltea a mirar al niño
+  } else if (P.modo === 'mesa' && G.est >= 0) {
+    puntoPipoMesa(G.est, _v1); P.pos.copy(_v1);
+    girarPipo(Math.atan2(camera.position.x - P.pos.x, camera.position.z - P.pos.z), dt * 6);
+  } else if (P.modo === 'intro') {
+    girarPipo(Math.atan2(camera.position.x - P.pos.x, camera.position.z - P.pos.z), dt * 6);
+  }
+  // animación de fieltro
+  const habla = hablandoHasta > G.t && hablandoQuien === 'pipo';
+  let salto = 0, sq = 1, giroExtra = 0;
+  if (moviendo) { salto = Math.abs(Math.sin(P.fase * 11)) * 0.07; sq = 1 + Math.sin(P.fase * 22) * 0.05; }
+  else if (habla) { salto = Math.abs(Math.sin(P.fase * 9)) * 0.025; }
+  if (P.gesto > 0) {
+    P.gesto -= dt;
+    if (P.tipoGesto === 'celebra') { salto += Math.abs(Math.sin(P.gesto * 9)) * 0.14; giroExtra = (1.4 - P.gesto) * TAU / 1.4; }
+    else { P.cuerpo.rotation.x = Math.sin(P.gesto * 8) * 0.2; }
+  } else P.cuerpo.rotation.x *= 0.9;
+  if (P.baile) { salto += Math.abs(Math.sin(P.fase * 7)) * 0.1; giroExtra = Math.sin(P.fase * 3) * 0.8; }
+  if (G.modo === 'menu') giroExtra = Math.sin(P.fase * 2) * 0.4;
+  P.cuerpo.position.y = salto; P.cuerpo.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq));
+  P.raiz.rotation.y = P.yaw + giroExtra;
+  const o = Math.sin(P.fase * (habla ? 14 : 3)) * (habla ? 0.25 : 0.08);
+  P.orejas[0].rotation.z = 0.25 + o; P.orejas[1].rotation.z = -0.25 - o;
+  // ratones
+  PJ.ratones.forEach((r, k) => {
+    r.salto = Math.max(0, r.salto - dt);
+    r.m.position.y = r.base + Math.abs(Math.sin(G.t * 2 + k)) * 0.01 + (r.salto > 0 ? Math.abs(Math.sin(r.salto * 10)) * 0.12 : 0);
+  });
+}
+function girarPipo(obj, k) { const P = PJ.pipo; let d = obj - P.yaw; while (d > PI) d -= TAU; while (d < -PI) d += TAU; P.yaw += d * Math.min(1, k); }
+let tBoca = 0;
+function actualizarDecor(dt) {
+  MUNDO.fuego.scale.set(1 + Math.sin(G.t * 13) * 0.08, 1 + Math.sin(G.t * 17) * 0.12, 1);
+  LUZ.horno.intensity = 0.8 + Math.sin(G.t * 11) * 0.12;
+  const ginoHabla = hablandoHasta > G.t && hablandoQuien === 'gino';
+  tBoca += dt; if (tBoca > 0.14) { tBoca = 0; MUNDO.texRetrato.offset.x = ginoHabla && MUNDO.texRetrato.offset.x === 0 ? 0.5 : 0; }
+  if (G.est >= 0 && G.estacionLista && G.modo !== 'menu') {
+    const m = MESAS[G.est]; MUNDO.estrella.visible = G.modo === 'caminar'; MUNDO.estrella.position.set(m.c[0], 1.9 + Math.sin(G.t * 2.5) * 0.08, m.c[1]); MUNDO.estrella.rotation.y = G.t * 1.5;
+    puntoAcercamiento(G.est, _v1); MUNDO.aro.visible = G.modo === 'caminar'; MUNDO.aro.position.set(_v1.x, 0.02, _v1.z); MUNDO.aro.scale.setScalar(1 + Math.sin(G.t * 4) * 0.08);
+  } else { MUNDO.estrella.visible = false; MUNDO.aro.visible = false; }
+  M.halo.opacity = 0.55 + Math.sin(G.t * 6) * 0.3;
+  M.anillo.opacity = 0.65 + Math.sin(G.t * 4) * 0.25;
+  if (FX.haloSel.visible) FX.haloSel.scale.setScalar(FX.haloSel.userData.r * (1 + Math.sin(G.t * 8) * 0.06));
+  if (FX.haloPista.visible) FX.haloPista.scale.setScalar(FX.haloPista.userData.r * (1 + Math.sin(G.t * 6) * 0.12));
+  if (MIG.obj.visible) MIG.obj.material.size = 0.05 + Math.sin(G.t * 6) * 0.012;
+}
+
+/* ===================== 18. PIEZAS, PROPS Y RANURAS ===================== */
+// Cada pieza es un Mesh o un Group de máximo 3 mallas. Nunca InstancedMesh.
+const ALTURA_BASE = { queso: 0.035, pizzaCorte: 0, cuchilla: 0.02, topping: 0.012, porcion: 0, champi: 0, estrella: 0.03, mapa: 0 };
+function geoQueso() { return cache('queso', () => { const g = new THREE.CylinderGeometry(0.11, 0.11, 0.07, 3); return colorearPorNormal(g, CONFIG.C.queso, 0xf0b02c); }); }
+function geoCuchilla() {
+  return cache('cuchilla', () => fusionar([
+    { g: cajaRedonda(0.24, 0.012, 0.07, 0.02), m: matriz(-0.04, 0, 0), c: 0xe4ecee },
+    { g: geoCil(), m: matriz(0.13, 0.008, 0, 0, 0, PI / 2, 0.022, 0.13, 0.022), c: CONFIG.C.tomate }]));
+}
+function geoTopping(cual) {
+  return cache('top' + cual, () => cual === 'queso'
+    ? fusionar([{ g: cajaRedonda(0.15, 0.024, 0.15, 0.03), m: matriz(0, 0, 0), c: CONFIG.C.queso }, { g: geoCil8(), m: matriz(0.03, 0.012, 0.025, 0, 0, 0, 0.02, 0.003, 0.02), c: CONFIG.C.queso2 }, { g: geoCil8(), m: matriz(-0.035, 0.012, -0.02, 0, 0, 0, 0.014, 0.003, 0.014), c: CONFIG.C.queso2 }])
+    : fusionar([{ g: geoCil(), m: matriz(0, 0, 0, 0, 0, 0, 0.085, 0.024, 0.085), c: CONFIG.C.jamon }, { g: geoToro(0.082, 0.01), m: matriz(0, 0.008, 0, PI / 2, 0, 0), c: 0xe27f8a }]));
+}
+function geoChampi() {
+  return cache('champi', () => {
+    const p = [];
+    [[0, 0, 1], [0.05, 0.04, 0.8], [-0.05, 0.035, 0.85]].forEach(([x, z, s]) => {
+      p.push({ g: geoCil8(), m: matriz(x, 0.025 * s, z, 0, 0, 0, 0.018 * s, 0.05 * s, 0.018 * s), c: CONFIG.C.champi });
+      p.push({ g: new THREE.SphereGeometry(1, 10, 5, 0, TAU, 0, PI / 2), m: matriz(x, 0.045 * s, z, 0, 0, 0, 0.045 * s, 0.035 * s, 0.045 * s), c: 0xc98b52 });
+    });
+    return fusionar(p);
+  });
+}
+function geoEstrellaPlana() { return cache('estPlana', () => { const g = geoEstrella(0.1, 0.03).clone(); g.rotateX(-PI / 2); return g; }); }
+function geoMapaCuadro(q) { // plano con la UV de su cuadrante: q=0 arriba-izq, 1 arriba-der, 2 abajo-izq, 3 abajo-der
+  return cache('mq' + q, () => {
+    const g = new THREE.PlaneGeometry(0.26, 0.26), uv = g.attributes.uv, u0 = (q % 2) * 0.5, v0 = q < 2 ? 0.5 : 0;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, u0 + uv.getX(i) * 0.5, v0 + uv.getY(i) * 0.5);
+    g.rotateX(-PI / 2); return g;
+  });
+}
+const MATS_PIZZA = [];
+function construirPieza(tipo, d) {
+  switch (tipo) {
+    case 'queso': return new THREE.Mesh(geoQueso(), M.fieltro);
+    case 'pizzaCorte': {
+      const g = new THREE.Group(); g.add(new THREE.Mesh(geoPizzaBase(d.R), M.fieltro));
+      const mat = new THREE.MeshLambertMaterial({ map: texPizzaCortes(d.partes, d.giro) }); MATS_PIZZA.push(mat);
+      const top = new THREE.Mesh(cache('tp' + d.R, () => { const c = new THREE.CircleGeometry(d.R * 0.9, 24); c.rotateX(-PI / 2); return c; }), mat);
+      top.position.y = 0.0245; g.add(top); return g;
+    }
+    case 'cuchilla': return new THREE.Mesh(geoCuchilla(), M.liso);
+    case 'topping': return new THREE.Mesh(geoTopping(d.cual), M.fieltro);
+    case 'porcion': return new THREE.Mesh(geoPorcion(d.ang, d.R, d.tono || 0, true), M.fieltro);
+    case 'champi': return new THREE.Mesh(geoChampi(), M.fieltro);
+    case 'estrella': return new THREE.Mesh(geoEstrellaPlana(), M.dorado);
+    case 'mapa': {
+      const g = new THREE.Group(); g.add(new THREE.Mesh(cajaRedonda(0.28, 0.02, 0.28, 0.02), M.madera));
+      const t = new THREE.Mesh(geoMapaCuadro(d.q), M.mapa); t.position.y = 0.0115; g.add(t); return g;
+    }
+  }
+  return new THREE.Mesh(geoEsfera(), M.fieltro);
+}
+function construirProp(tipo, d) {
+  const C = CONFIG.C;
+  switch (tipo) {
+    case 'plato': return new THREE.Mesh(geoPlato(d.R), M.fieltro);
+    case 'caja': return new THREE.Mesh(cache('caja', () => fusionar([
+      { g: cajaRedonda(1.0, 0.02, 0.42, 0.03), m: matriz(0, 0.01, 0), c: C.crema2 },
+      { g: cajaRedonda(1.0, 0.07, 0.03, 0.012), m: matriz(0, 0.035, -0.205), c: C.madera }, { g: cajaRedonda(1.0, 0.07, 0.03, 0.012), m: matriz(0, 0.035, 0.205), c: C.madera },
+      { g: cajaRedonda(0.03, 0.07, 0.42, 0.012), m: matriz(-0.495, 0.035, 0), c: C.madera }, { g: cajaRedonda(0.03, 0.07, 0.42, 0.012), m: matriz(0.495, 0.035, 0), c: C.madera },
+      { g: geoCaja(), m: matriz(0, 0.072, 0.21, 0, 0, 0, 0.5, 0.02, 0.02), c: C.tomate }])), M.madera);
+    case 'bandeja': return new THREE.Mesh(cache('bandeja', () => fusionar([
+      { g: geoCil(), m: matriz(0, 0.008, 0, 0, 0, 0, 0.3, 0.016, 0.3), c: C.madera },
+      { g: geoToro(0.3, 0.018), m: matriz(0, 0.016, 0, PI / 2, 0, 0), c: C.madera2 },
+      { g: geoCaja(), m: matriz(0, 0.017, 0, 0, 0, 0, 0.56, 0.003, 0.012), c: C.cafe }, { g: geoCaja(), m: matriz(0, 0.017, 0, 0, 0, 0, 0.012, 0.003, 0.56), c: C.cafe }])), M.madera);
+    case 'marco': return new THREE.Mesh(cache('marco', () => fusionar([
+      { g: cajaRedonda(0.66, 0.012, 0.66, 0.03), m: matriz(0, 0.006, 0), c: C.crema2 },
+      { g: geoCaja(), m: matriz(0, 0.014, -0.32, 0, 0, 0, 0.66, 0.03, 0.03), c: C.madera2 }, { g: geoCaja(), m: matriz(0, 0.014, 0.32, 0, 0, 0, 0.66, 0.03, 0.03), c: C.madera2 },
+      { g: geoCaja(), m: matriz(-0.32, 0.014, 0, 0, 0, 0, 0.03, 0.03, 0.66), c: C.madera2 }, { g: geoCaja(), m: matriz(0.32, 0.014, 0, 0, 0, 0, 0.03, 0.03, 0.66), c: C.madera2 },
+      { g: geoCaja(), m: matriz(0, 0.013, 0, 0, 0, 0, 0.62, 0.004, 0.01), c: C.madera }, { g: geoCaja(), m: matriz(0, 0.013, 0, 0, 0, 0, 0.01, 0.004, 0.62), c: C.madera }])), M.madera);
+    case 'pizzaLinea': {
+      const g = new THREE.Group(); g.add(new THREE.Mesh(geoPizzaBase(d.R), M.fieltro));
+      const mat = new THREE.MeshLambertMaterial({ map: texPizzaLinea(d.dFrac, d.alfa) }); MATS_PIZZA.push(mat);
+      const top = new THREE.Mesh(cache('tp' + d.R, () => { const c = new THREE.CircleGeometry(d.R * 0.9, 24); c.rotateX(-PI / 2); return c; }), mat);
+      top.position.y = 0.0245; g.add(top); return g;
+    }
+    case 'porcionFija': return new THREE.Mesh(geoPorcion(d.ang, d.R, 0, true), M.fieltro);
+    case 'mitadCortada': return new THREE.Mesh(geoSegmento(0, d.R, d.lado), M.fieltro);
+    case 'cajita': {
+      const g = new THREE.Group();
+      g.add(new THREE.Mesh(cache('cajitaBase' + d.color, () => fusionar([{ g: cajaRedonda(0.26, 0.12, 0.22, 0.03), m: matriz(0, 0.06, 0), c: C[d.color] || C.turquesa },
+        { g: cajaRedonda(0.27, 0.025, 0.06, 0.01), m: matriz(0, 0.07, 0.105), c: C.crema }])), M.fieltro));
+      const tapa = new THREE.Group(); tapa.position.set(0, 0.12, -0.11);
+      const tm = new THREE.Mesh(cache('cajitaTapa', () => fusionar([{ g: cajaRedonda(0.28, 0.04, 0.24, 0.03), m: matriz(0, 0.02, 0.12), c: C.dorado }])), M.fieltro);
+      tapa.add(tm); g.add(tapa); g.userData.tapa = tapa; return g;
+    }
+  }
+  return new THREE.Group();
+}
+function crearPieza(i, sp) {
+  const obj = construirPieza(sp.tipo, sp.datos || {}), w = aMundo(i, sp.home[0], sp.home[1], new V3()), y0 = ALTURA_BASE[sp.tipo] || 0;
+  obj.position.set(w.x, CONFIG.MESA_H + y0, w.z); obj.rotation.y = MESAS[i].rot + (sp.rot || 0); scene.add(obj);
+  const p = { id: sp.id, tipo: sp.tipo, datos: sp.datos || {}, obj, home: obj.position.clone(), homeRot: obj.rotation.y, y0, ranura: null, activa: false, anim: null, destinos: sp.destinos || null, est: i };
+  obj.traverse((m) => { if (m.isMesh) m.userData.pieza = p; });
+  return p;
+}
+function crearProp(i, sp) { // props fijos: hijos del grupo de la mesa, en coordenadas locales
+  const obj = construirProp(sp.tipo, sp.datos || {});
+  obj.position.set(sp.pos[0], sp.y || 0, sp.pos[1]); obj.rotation.y = sp.rot || 0; MESAS[i].grupo.add(obj); return obj;
+}
+function crearRanura(i, sp) {
+  const w = aMundo(i, sp.pos[0], sp.pos[1], new V3()); w.y = CONFIG.MESA_H;
+  const m = MESAS[i], poses = (sp.poses || [[0, 0]]).map(([dx, dz]) => ({ x: w.x + dx * m.cos + dz * m.sin, z: w.z - dx * m.sin + dz * m.cos }));
+  const r = { id: sp.id, centro: w, radius: sp.r, capacidad: sp.cap || 1, items: [], grupo: sp.grupo || sp.id, acceptsType: sp.acepta,
+    llenoEsError: !!sp.lleno, rotY: sp.rot == null ? null : m.rot + sp.rot, poses, yOff: sp.y || 0, bonus: 0, activa: false, est: i, errVoz: sp.err || null };
+  r.accepts = (p) => r.acceptsType(p) && r.items.length < r.capacidad;
+  r.anillo = new THREE.Mesh(geoAnillo(sp.anillo || 0.1), M.anillo); r.anillo.position.set(w.x, CONFIG.MESA_H + r.yOff + 0.012, w.z); r.anillo.visible = false; scene.add(r.anillo);
+  return r;
+}
+
+/* ===================== 19. ENCAJE: findCandidate (PURA) y decisión ===================== */
+function distRanura(r, x, z) { const dx = x - r.centro.x, dz = z - r.centro.z; return Math.sqrt(dx * dx + dz * dz); }
+function radioEncaje(r) { return r.radius + CONFIG.SNAP_EXTRA + (r.bonus || 0); }
+// Devuelve la ranura COMPATIBLE más cercana (distancia en X,Z sobre la mesa entre la pieza y el centro de la ranura)
+function findCandidate(pieza, x, z, ranuras) {
+  let mejor = null, md = Infinity;
+  for (let i = 0; i < ranuras.length; i++) {
+    const r = ranuras[i]; if (!r.activa || !r.accepts(pieza)) continue;
+    const d = distRanura(r, x, z); if (d <= radioEncaje(r) && d < md) { md = d; mejor = r; }
+  }
+  return mejor;
+}
+function findNearest(pieza, x, z, ranuras) {
+  let mejor = null, md = Infinity;
+  for (let i = 0; i < ranuras.length; i++) {
+    const r = ranuras[i]; if (!r.activa) continue;
+    const d = distRanura(r, x, z); if (d <= radioEncaje(r) && d < md) { md = d; mejor = r; }
+  }
+  return mejor;
+}
+// encaja | error (ranura que no la acepta) | ocupado (llena, sin ser error) | nada
+function decidir(p, x, z, ranuras, out) {
+  const c = findCandidate(p, x, z, ranuras), n = findNearest(p, x, z, ranuras);
+  out.tipo = 'nada'; out.ranura = null;
+  if (!n) return out;
+  if (c && (n === c || n.grupo === c.grupo || distRanura(c, x, z) <= distRanura(n, x, z) + 0.001)) { out.tipo = 'encaja'; out.ranura = c; return out; }
+  out.ranura = n;
+  out.tipo = (n.acceptsType(p) && n.items.length >= n.capacidad && !n.llenoEsError) ? 'ocupado' : 'error';
+  return out;
+}
+
+/* ===================== 20. ARRASTRE: máquina de estados IDLE/HOVER/DRAGGING/SNAPPING/RETURNING ===================== */
+const DR = { estado: 'IDLE', pieza: null, sel: null, pid: null, x0: 0, y0: 0, movido: false, off: new V3(), obj: new V3(), cand: null, res: { tipo: '', ranura: null } };
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), _hit = new V3(), _loc = new V3();
+const planoArrastre = new THREE.Plane(new V3(0, 1, 0), -(CONFIG.MESA_H + CONFIG.PLANO_ALTURA));
+const planoMesa = new THREE.Plane(new V3(0, 1, 0), -CONFIG.MESA_H);
+let canvas;
+function rayo(e) { const rc = canvas.getBoundingClientRect(); ndc.set(((e.clientX - rc.left) / rc.width) * 2 - 1, -((e.clientY - rc.top) / rc.height) * 2 + 1); ray.setFromCamera(ndc, camera); }
+function piezaBajo(e) { rayo(e); const h = ray.intersectObjects(G.pickables, false); return h.length ? h[0].object.userData.pieza : null; }
+function limitarMesa(x, z, out) { // la posición se limita al tablero
+  aLocal(G.est, x, z, _loc); _loc.x = clamp(_loc.x, -1.22, 1.22); _loc.z = clamp(_loc.z, -0.62, 0.62);
+  aMundo(G.est, _loc.x, _loc.z, out); return out;
+}
+function interactivo() { return G.modo === 'mesa' && PASO && !PASO.ocupado && !G.pausa; }
+function actualizarPickables() {
+  G.pickables.length = 0;
+  for (const p of G.piezas) if (p.activa && !p.ranura) p.obj.traverse((m) => { if (m.isMesh) G.pickables.push(m); });
+}
+function pintarAnillos() {
+  for (const r of G.ranuras) {
+    r.anillo.visible = r.activa && r.items.length < r.capacidad;
+    r.anillo.material = r === DR.cand ? M.anilloOk : (PASO && PASO.pistaK && PASO.pistaK.r === r ? M.anilloPista : M.anillo);
+  }
+}
+function angCercano(desde, hacia) { let d = hacia - desde; while (d > PI) d -= TAU; while (d < -PI) d += TAU; return desde + d; }
+function onDown(e) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  canvas.focus();
+  if (!interactivo() || DR.estado === 'SNAPPING' || DR.estado === 'RETURNING' || DR.estado === 'DRAGGING') return;
+  const p = piezaBajo(e);
+  if (p) {
+    DR.estado = 'DRAGGING'; DR.pieza = p; DR.pid = e.pointerId; DR.x0 = e.clientX; DR.y0 = e.clientY; DR.movido = false; DR.cand = null;
+    try { canvas.setPointerCapture(e.pointerId); } catch (er) { }
+    cancelarAnim(p.anim);
+    if (ray.ray.intersectPlane(planoArrastre, _hit)) { DR.off.set(p.obj.position.x - _hit.x, 0, p.obj.position.z - _hit.z); DR.obj.set(p.obj.position.x, 0, p.obj.position.z); }
+    else { DR.off.set(0, 0, 0); DR.obj.set(p.obj.position.x, 0, p.obj.position.z); }
+    e.preventDefault(); return;
+  }
+  if (DR.sel) { // TOCA Y TOCA: tocar una ranura envía la pieza seleccionada
+    const pt = ray.ray.intersectPlane(planoMesa, _hit);
+    const r = pt ? findNearest(DR.sel, pt.x, pt.z, G.ranuras) : null;
+    if (r) { enviarSeleccion(DR.sel, r); return; }
+    deseleccionar();
+  }
+}
+function onMove(e) {
+  if (DR.estado === 'DRAGGING') {
+    if (e.pointerId !== DR.pid) return;
+    if (!DR.movido) {
+      if (G.opc.clic || Math.hypot(e.clientX - DR.x0, e.clientY - DR.y0) < CONFIG.TAP_PX) return;
+      DR.movido = true; deseleccionar(); sonar('plop'); canvas.style.cursor = 'grabbing';
+    }
+    rayo(e);
+    if (ray.ray.intersectPlane(planoArrastre, _hit)) limitarMesa(_hit.x + DR.off.x, _hit.z + DR.off.z, DR.obj);
+    return;
+  }
+  if ((DR.estado === 'IDLE' || DR.estado === 'HOVER') && interactivo()) {
+    const p = piezaBajo(e); DR.estado = p ? 'HOVER' : 'IDLE';
+    let cur = p ? 'grab' : 'default';
+    if (!p && DR.sel) { const pt = ray.ray.intersectPlane(planoMesa, _hit); if (pt && findNearest(DR.sel, pt.x, pt.z, G.ranuras)) cur = 'pointer'; }
+    canvas.style.cursor = cur;
+  } else if (DR.estado !== 'DRAGGING') canvas.style.cursor = 'default';
+}
+function liberar() { try { if (DR.pid != null && canvas.hasPointerCapture(DR.pid)) canvas.releasePointerCapture(DR.pid); } catch (er) { } DR.pid = null; }
+function onUp(e) {
+  if (DR.estado !== 'DRAGGING' || e.pointerId !== DR.pid) return;
+  const p = DR.pieza, movido = DR.movido;
+  DR.estado = 'IDLE'; DR.pieza = null; liberar(); canvas.style.cursor = 'default';
+  if (movido) soltar(p);
+  else { if (DR.sel === p) deseleccionar(); else seleccionar(p); }
+}
+function cancelarArrastre() { // pointercancel, lostpointercapture, blur, Esc: la pieza vuelve a su lugar
+  if (DR.estado !== 'DRAGGING') return;
+  const p = DR.pieza; DR.estado = 'IDLE'; DR.pieza = null; DR.cand = null; liberar(); canvas.style.cursor = 'default';
+  pintarAnillos(); if (p && DR.movido) volverPieza(p);
+}
+function seleccionar(p) { deseleccionar(); DR.sel = p; ponerHalo(FX.haloSel, p.obj.position.x, p.obj.position.z, 0.2); sonar('tic'); p.obj.position.y = p.home.y + 0.04; }
+function deseleccionar() { if (DR.sel) { if (!DR.sel.ranura && !DR.sel.anim) DR.sel.obj.position.y = DR.sel.home.y; DR.sel = null; } FX.haloSel.visible = false; }
+function soltar(p) {
+  const o = p.obj.position, r = decidir(p, o.x, o.z, G.ranuras, DR.res);
+  DR.cand = null; pintarAnillos();
+  if (r.tipo === 'encaja') encajar(p, r.ranura, {});
+  else if (r.tipo === 'error') { const rr = r.ranura; volverPieza(p); errorEn(p, rr); }
+  else if (r.tipo === 'ocupado') { volverPieza(p); decir(r.ranura.errVoz || 'errLleno'); }
+  else volverPieza(p);
+}
+function enviarSeleccion(p, ranura) { // misma lógica que soltar, usando el centro de la ranura tocada
+  deseleccionar(); p.obj.position.y = p.home.y;
+  const r = decidir(p, ranura.centro.x, ranura.centro.z, G.ranuras, DR.res);
+  if (r.tipo === 'encaja') encajar(p, r.ranura, { dur: 0.5, arco: 0.18 });
+  else if (r.tipo === 'error') errorEn(p, r.ranura);
+  else if (r.tipo === 'ocupado') decir(r.ranura.errVoz || 'errLleno');
+}
+function encajar(p, r, o) {
+  DR.estado = 'SNAPPING'; cancelarAnim(p.anim);
+  const idx = r.items.length; r.items.push(p); p.ranura = r; p.activa = false; actualizarPickables(); pintarAnillos();
+  const pose = r.poses[Math.min(idx, r.poses.length - 1)];
+  const ax = p.obj.position.x, ay = p.obj.position.y, az = p.obj.position.z;
+  const by = CONFIG.MESA_H + r.yOff + p.y0, r0 = p.obj.rotation.y, r1 = r.rotY == null ? r0 : angCercano(r0, r.rotY), arco = o.arco || 0;
+  p.anim = animar(o.dur || CONFIG.T_ENCAJE, (k) => {
+    p.obj.position.set(lerp(ax, pose.x, k), lerp(ay, by, Math.min(1, k)) + Math.sin(Math.min(1, k) * PI) * arco, lerp(az, pose.z, k));
+    p.obj.rotation.y = lerp(r0, r1, Math.min(1, k));
+  }, EASE.back, () => {
+    p.anim = null; p.obj.position.set(pose.x, by, pose.z); p.obj.rotation.y = r1;
+    DR.estado = 'IDLE'; sonar('toc'); chispas(pose.x, by + 0.05, pose.z, 10, 0.5);
+    alColocar(p, r, !!o.auto);
+  });
+}
+function volverPieza(p, dur) {
+  cancelarAnim(p.anim); DR.estado = 'RETURNING';
+  const a = p.obj.position.clone(), r0 = p.obj.rotation.y, r1 = angCercano(r0, p.homeRot);
+  p.anim = animar(dur || CONFIG.T_VOLVER, (k) => { p.obj.position.lerpVectors(a, p.home, k); p.obj.rotation.y = lerp(r0, r1, k); }, EASE.salida, () => {
+    p.anim = null; p.obj.rotation.y = p.homeRot; if (DR.estado === 'RETURNING') DR.estado = 'IDLE';
+  });
+}
+function actualizarArrastre(dt) {
+  if (DR.estado === 'DRAGGING' && DR.movido && DR.pieza) {
+    const p = DR.pieza, o = p.obj.position;
+    const r = decidir(p, o.x, o.z, G.ranuras, DR.res), cand = r.tipo === 'encaja' ? r.ranura : null;
+    let tx = DR.obj.x, tz = DR.obj.z;
+    if (cand) { tx = lerp(tx, cand.centro.x, 0.35); tz = lerp(tz, cand.centro.z, 0.35); } // imán visible
+    const a = 1 - Math.pow(1 - CONFIG.LERP_ARRASTRE, dt * 60);
+    o.x = lerp(o.x, tx, a); o.z = lerp(o.z, tz, a); o.y = lerp(o.y, CONFIG.MESA_H + CONFIG.PLANO_ALTURA + p.y0, a);
+    if (cand !== DR.cand) { DR.cand = cand; if (cand) sonar('tic'); pintarAnillos(); }
+  }
+  if (DR.sel && FX.haloSel.visible) FX.haloSel.position.set(DR.sel.obj.position.x, CONFIG.MESA_H + 0.01, DR.sel.obj.position.z);
+  if (PASO && PASO.pistaK && FX.haloPista.visible) FX.haloPista.position.set(PASO.pistaK.p.obj.position.x, CONFIG.MESA_H + 0.012, PASO.pistaK.p.obj.position.z);
+}
+
+/* ===================== 21. PASOS: progreso, errores que enseñan y conceptos ===================== */
+let PASO = null;
+const EST = { piezas: new Map(), ranuras: new Map(), props: new Map(), extras: [] };
+function registrarUnidad(conceptos, ok) { for (const c of conceptos) { G.conceptos[c][1]++; if (ok) G.conceptos[c][0]++; } }
+function usarPista() { if (PASO && !PASO.uAyuda) { PASO.uAyuda = true; G.pistas++; } }
+// Crea (o reutiliza) piezas y ranuras de un paso del plan y espera a que se complete
+function hacerPaso(i, def, extra) {
+  const piezas = def.piezas.map((sp) => { let p = EST.piezas.get(sp.id); if (!p) { p = crearPieza(i, sp); EST.piezas.set(sp.id, p); popIn(p.obj); } p.destinos = sp.destinos || null; return p; });
+  const ranuras = def.ranuras.map((sp) => { let r = EST.ranuras.get(sp.id); if (!r) { r = crearRanura(i, sp); EST.ranuras.set(sp.id, r); } return r; });
+  PASO = Object.assign({ colocados: 0, errores: 0, uErr: false, uAyuda: false, uAuto: false, tPista: 0, nivel: 0, ocupado: false, pistaK: null }, def, extra || {});
+  PASO.piezas = piezas; PASO.ranuras = ranuras;
+  G.piezas = piezas; G.ranuras = ranuras;
+  ranuras.forEach((r) => { r.activa = true; r.bonus = 0; });
+  piezas.forEach((p) => { p.activa = !p.ranura; });
+  actualizarPickables(); pintarAnillos();
+  const fin = esperarSenal('fin_' + def.id);
+  return fin;
+}
+function popIn(obj) { obj.scale.setScalar(0.01); animar(0.4, (k) => obj.scale.setScalar(Math.max(0.01, k)), EASE.back); }
+function terminarPaso() {
+  if (!PASO) return;
+  const id = PASO.id; limpiarPistas(); deseleccionar();
+  G.ranuras.forEach((r) => { r.activa = false; }); pintarAnillos();
+  G.piezas.forEach((p) => { p.activa = false; }); actualizarPickables();
+  PASO = null; emitir('fin_' + id);
+}
+async function alColocar(p, r, auto) {
+  if (!PASO) return;
+  const P = PASO; P.colocados++; if (auto) P.uAuto = true;
+  limpiarPistas(); P.tPista = 0; P.nivel = 0; P.errores = 0;
+  if (P.porColocacion) { registrarUnidad(P.conceptos, !P.uErr && !P.uAuto); P.uErr = false; P.uAuto = false; }
+  P.uAyuda = false;
+  P.ocupado = true;
+  if (P.alColocar) await P.alColocar(p, r);
+  if (PASO !== P) return;
+  P.ocupado = false;
+  if (P.colocados >= P.necesarios) { if (!P.porColocacion) registrarUnidad(P.conceptos, !P.uErr && !P.uAuto); terminarPaso(); }
+}
+async function errorEn(p, r) {
+  if (!PASO) return;
+  const P = PASO; P.uErr = true; P.errores++; P.ocupado = true;
+  sonar('boing'); pipoGesto('senala');
+  if (P.alError) await P.alError(p, r); else await decir(r.errVoz || 'errPlato');
+  if (PASO !== P) return;
+  if (P.errores >= 2) { P.errores = 0; await demoSolucion(); }
+  if (PASO === P) P.ocupado = false;
+}
+function clavePaso() { // pieza clave y su ranura correcta (para pistas y demostraciones)
+  if (!PASO) return null;
+  for (const p of PASO.piezas) {
+    if (!p.activa || p.ranura || !p.destinos) continue;
+    for (const id of p.destinos) { const r = PASO.ranuras.find((x) => x.id === id && x.accepts(p)); if (r) return { p, r }; }
+  }
+  return null;
+}
+async function demoSolucion() { // tras 2 errores: Pipo muestra la solución y resalta la pieza correcta
+  const k = clavePaso(); if (!k) return;
+  usarPista(); PASO.pistaK = k; ponerHalo(FX.haloPista, k.p.obj.position.x, k.p.obj.position.z, 0.22); pintarAnillos();
+  pipoGesto('senala');
+  await decir('demoError');
+  const p = k.p, a = p.home.clone(), b = new V3(k.r.poses[0].x, CONFIG.MESA_H + k.r.yOff + p.y0 + 0.02, k.r.poses[0].z);
+  await animarP(0.8, (t) => { p.obj.position.lerpVectors(a, b, t); p.obj.position.y += Math.sin(t * PI) * 0.2; });
+  sonar('tic'); await esperar(0.5);
+  await animarP(0.6, (t) => { p.obj.position.lerpVectors(b, a, t); p.obj.position.y += Math.sin(t * PI) * 0.12; });
+  p.obj.position.copy(a);
+}
+function limpiarPistas() {
+  FX.haloPista.visible = false; ocultarMigajas();
+  for (const r of G.ranuras) r.bonus = 0;
+  if (PASO) PASO.pistaK = null; pintarAnillos();
+}
+/* Pistas por tiempo en modo mesa: 20 s brillo (+radio), 40 s migajas, 70 s Pipo lo hace */
+function actualizarPistas(dt) {
+  if (!PASO || G.modo !== 'mesa' || PASO.ocupado || DR.estado === 'DRAGGING' || DR.estado === 'SNAPPING') return;
+  PASO.tPista += dt;
+  const T = CONFIG.PISTAS;
+  if (PASO.nivel < 1 && PASO.tPista >= T[0]) { PASO.nivel = 1; pista1(); }
+  else if (PASO.nivel < 2 && PASO.tPista >= T[1]) { PASO.nivel = 2; pista2(); }
+  else if (PASO.nivel < 3 && PASO.tPista >= T[2]) { PASO.nivel = 3; pista3(); }
+}
+async function pista1() {
+  const k = clavePaso(); if (!k) return;
+  usarPista(); PASO.pistaK = k; k.r.bonus = CONFIG.BONUS_PISTA;
+  ponerHalo(FX.haloPista, k.p.obj.position.x, k.p.obj.position.z, 0.22); pintarAnillos(); pipoGesto('senala');
+  await decir(PASO.instr); if (PASO) await decir(PASO.pista1 || 'pista1');
+}
+async function pista2() {
+  const k = PASO.pistaK || clavePaso(); if (!k) return;
+  usarPista(); PASO.pistaK = k; k.r.bonus = CONFIG.BONUS_PISTA; ponerHalo(FX.haloPista, k.p.obj.position.x, k.p.obj.position.z, 0.22); pintarAnillos();
+  mostrarMigajas(k.p.obj.position, k.r.centro); pipoGesto('senala'); decir('pista2');
+}
+async function pista3() {
+  const k = clavePaso(); if (!k) return;
+  usarPista(); const P = PASO; P.ocupado = true; deseleccionar();
+  pipoGesto('celebra'); await decir('pista3');
+  if (PASO !== P) return;
+  const r = decidir(k.p, k.r.centro.x, k.r.centro.z, G.ranuras, DR.res); // misma lógica de encaje
+  if (r.tipo === 'encaja') encajar(k.p, r.ranura, { dur: 0.7, arco: 0.25, auto: true }); else P.ocupado = false;
+}
+
+/* ===================== 22. PLANES DE LAS ESTACIONES (datos puros en coordenadas locales de la mesa) ===================== */
+// X local = derecha de la pantalla, Z local = hacia la cámara. Pipo ocupa la esquina (-1.08, -0.48).
+const esPorcion = (ang) => (p) => p.tipo === 'porcion' && p.datos.ang === ang;
+function crearPlanes() {
+  const P = [];
+  // 0. Práctica
+  P[0] = { props: [{ id: 'plato', tipo: 'plato', pos: [0.35, 0], datos: { R: 0.2 } }],
+    pasos: { e0: { id: 'e0', conceptos: [], porColocacion: true, necesarios: 1, instr: 'tutHacer', pista1: 'tutToca',
+      piezas: [{ id: 'queso', tipo: 'queso', home: [-0.45, 0.2], rot: 0.3, destinos: ['plato'] }],
+      ranuras: [{ id: 'plato', pos: [0.35, 0], r: 0.12, anillo: 0.2, y: 0.02, acepta: (p) => p.tipo === 'queso' }] } } };
+  // 1. Partes iguales: 3 iguales y 3 desiguales, mezcladas al azar
+  {
+    const ig = [[180, 180], [120, 120, 120], [90, 90, 90, 90]], de = [[240, 120], [200, 100, 60], [150, 100, 70, 40]];
+    const homes = barajar([[-0.65, -0.25], [-0.25, -0.25], [0.15, -0.25], [-1.0, 0.3], [-0.6, 0.3], [-0.2, 0.3]]), piezas = [];
+    ig.forEach((pt, k) => piezas.push({ id: 'pzI' + k, tipo: 'pizzaCorte', datos: { R: 0.15, partes: pt, giro: rnd(0, 360) | 0, iguales: true }, home: homes[k], destinos: ['caja'] }));
+    de.forEach((pt, k) => piezas.push({ id: 'pzD' + k, tipo: 'pizzaCorte', datos: { R: 0.15, partes: pt, giro: rnd(0, 360) | 0, iguales: false }, home: homes[3 + k], destinos: null }));
+    P[1] = { cajita: [1.05, -0.47], props: [{ id: 'caja', tipo: 'caja', pos: [0.75, 0.22] }],
+      pasos: { e1: { id: 'e1', conceptos: ['iguales'], porColocacion: true, necesarios: 3, instr: 'e1Hacer', piezas,
+        ranuras: [{ id: 'caja', pos: [0.75, 0.22], r: 0.4, cap: 3, anillo: 0.45, y: 0.02, poses: [[-0.31, 0], [0, 0], [0.31, 0]], acepta: (p) => p.tipo === 'pizzaCorte' && p.datos.iguales === true }] } } };
+  }
+  // 2. La mitad: 3 líneas punteadas, solo una pasa por el centro
+  {
+    const R = 0.21, xs = [-0.55, 0.03, 0.61], z = -0.12, ok = Math.floor(Math.random() * 3), ds = barajar([0.4, 0.6]), angs = barajar([0, 30, 60, 90, 120, 150]);
+    const pizzas = xs.map((x, k) => ({ x, z, dFrac: k === ok ? 0 : ds.pop(), alfa: angs[k] * DEG }));
+    const pz = pizzas[ok], nx = -Math.sin(pz.alfa), nz = Math.cos(pz.alfa), dh = centroideSector(PI, R);
+    P[2] = { cajita: [1.05, -0.47], ok, pizzas, R,
+      props: pizzas.map((p, k) => ({ id: 'pz' + k, tipo: 'pizzaLinea', pos: [p.x, p.z], datos: { R, dFrac: p.dFrac, alfa: p.alfa } })),
+      pasos: {
+        corte: { id: 'e2a', conceptos: ['mitad'], porColocacion: false, necesarios: 1, instr: 'e2Hacer',
+          piezas: [{ id: 'cuchilla', tipo: 'cuchilla', home: [0.82, 0.45], rot: 0.2, destinos: ['pz' + ok] }],
+          ranuras: pizzas.map((p, k) => ({ id: 'pz' + k, pos: [p.x, p.z], r: 0.1, anillo: 0.24, y: 0.03, rot: -p.alfa,
+            poses: [[-Math.sin(p.alfa) * p.dFrac * R * 0.9, Math.cos(p.alfa) * p.dFrac * R * 0.9]], acepta: (q) => q.tipo === 'cuchilla' && k === ok })) },
+        ingred: { id: 'e2b', conceptos: [], porColocacion: true, necesarios: 2, instr: 'e2Ingred',
+          piezas: [{ id: 'tQueso', tipo: 'topping', datos: { cual: 'queso' }, home: [-0.2, 0.45], destinos: ['mitA', 'mitB'] },
+            { id: 'tJamon', tipo: 'topping', datos: { cual: 'jamon' }, home: [0.3, 0.45], destinos: ['mitA', 'mitB'] }],
+          ranuras: [{ id: 'mitA', pos: [pz.x + nx * dh, pz.z + nz * dh], r: 0.05, anillo: 0.06, y: 0.035, lleno: true, err: 'errMitadLlena', acepta: (q) => q.tipo === 'topping' },
+            { id: 'mitB', pos: [pz.x - nx * dh, pz.z - nz * dh], r: 0.05, anillo: 0.06, y: 0.035, lleno: true, err: 'errMitadLlena', acepta: (q) => q.tipo === 'topping' }] }
+      } };
+  }
+  // 3. El cuarto: bandeja con 4 ranuras de cuarto y 6 porciones (4 de 90°, una de 45° y una de 135°)
+  {
+    const T = [0.3, -0.08], R = 0.25, dc = centroideSector(PI / 2, R), fis = [0, 1, 2, 3].map((k) => PI / 4 + k * PI / 2);
+    const homes = [[-1.02, 0.42], [-0.62, 0.42], [-0.22, 0.45], [0.92, 0.42], [-0.62, -0.02], [-0.22, -0.06]];
+    const angs = barajar([90, 90, 90, 90, 45, 135]), rots = [0, PI / 2, PI, -PI / 2, PI / 4, -PI / 4];
+    P[3] = { cajita: [1.05, -0.47], T, R, props: [{ id: 'bandeja', tipo: 'bandeja', pos: T }],
+      pasos: {
+        cuartos: { id: 'e3a', conceptos: ['cuarto'], porColocacion: false, necesarios: 4, instr: 'e3Hacer',
+          piezas: angs.map((a, k) => ({ id: 'po' + k, tipo: 'porcion', datos: { ang: a, R, tono: Math.random() < 0.5 ? 0 : 1 }, home: homes[k], rot: rots[(k * 5 + 1) % 6], destinos: a === 90 ? ['c0', 'c1', 'c2', 'c3'] : null })),
+          ranuras: fis.map((f, k) => ({ id: 'c' + k, pos: [T[0] + Math.sin(f) * dc, T[1] + Math.cos(f) * dc], r: 0.06, anillo: 0.07, y: 0.018, rot: f, grupo: 'cuartos', err: 'errLleno', acepta: esPorcion(90) })) },
+        champi: { id: 'e3b', conceptos: [], porColocacion: true, necesarios: 1, instr: 'e3Champi',
+          piezas: [{ id: 'champi', tipo: 'champi', home: [0.95, -0.05], destinos: ['m0', 'm1', 'm2', 'm3'] }],
+          ranuras: fis.map((f, k) => ({ id: 'm' + k, pos: [T[0] + Math.sin(f) * dc, T[1] + Math.cos(f) * dc], r: 0.05, anillo: 0.06, y: 0.055, grupo: 'champi', acepta: (q) => q.tipo === 'champi' })) }
+      } };
+  }
+  // 4. Comparar (mitad vs cuarto) y el tercio (3 ratoncitos)
+  {
+    const pos = barajar([[-0.45, 0.22], [0.2, 0.22]]), pM = pos[0], pC = pos[1], Pz = [0.15, 0.3], R = 0.2, dt3 = centroideSector(TAU / 3, R);
+    const platos = [[-0.6, -0.38], [0, -0.38], [0.6, -0.38]];
+    P[4] = { cajita: [1.08, 0.47], pM, pC, platos, Pz, R,
+      props: [{ id: 'platoM', tipo: 'plato', pos: pM, datos: { R: 0.2 } }, { id: 'platoC', tipo: 'plato', pos: pC, datos: { R: 0.2 } },
+        { id: 'fijaM', tipo: 'porcionFija', pos: pM, y: 0.02, datos: { ang: 180, R: 0.17 } }, { id: 'fijaC', tipo: 'porcionFija', pos: pC, y: 0.02, datos: { ang: 90, R: 0.17 } }],
+      pasos: {
+        comparar: { id: 'e4a', conceptos: ['mitad', 'cuarto'], porColocacion: false, necesarios: 1, instr: 'e4Hacer',
+          piezas: [{ id: 'estrella', tipo: 'estrella', home: [0.85, 0.05], destinos: ['pM'] }],
+          ranuras: [{ id: 'pM', pos: pM, r: 0.12, anillo: 0.22, y: 0.055, acepta: (q) => q.tipo === 'estrella' },
+            { id: 'pC', pos: pC, r: 0.12, anillo: 0.22, y: 0.055, acepta: () => false }] },
+        tercio: { id: 'e4b', conceptos: ['tercio'], porColocacion: false, necesarios: 3, instr: 'e4THacer',
+          piezas: [0, 1, 2].map((k) => { const f = k * TAU / 3; return { id: 't' + k, tipo: 'porcion', datos: { ang: 120, R, tono: k % 2 }, home: [Pz[0] + Math.sin(f) * (dt3 + 0.015), Pz[1] + Math.cos(f) * (dt3 + 0.015)], rot: f, destinos: ['p0', 'p1', 'p2'] }; }),
+          ranuras: platos.map((pp, k) => ({ id: 'p' + k, pos: pp, r: 0.1, anillo: 0.18, y: 0.02, rot: 0, lleno: true, err: 'errLleno', acepta: esPorcion(120) })) }
+      } };
+  }
+  // 5. Mesa del tesoro: mapa 2x2 y ronda del tesoro (3 pedidos al azar)
+  {
+    const F = [-0.25, -0.1], homesM = barajar([[0.42, -0.32], [0.88, -0.3], [0.42, 0.32], [0.88, 0.34]]);
+    const pedidos = barajar(G.opc.tercio ? [{ ang: 180, c: 'mitad', voz: 'pedMitad' }, { ang: 120, c: 'tercio', voz: 'pedTercio' }, { ang: 90, c: 'cuarto', voz: 'pedCuarto' }]
+      : [{ ang: 180, c: 'mitad', voz: 'pedMitad' }, { ang: 90, c: 'cuarto', voz: 'pedCuarto' }]);
+    const angs = barajar(G.opc.tercio ? [180, 120, 90, 60, 45] : [180, 90, 135, 60, 45]), xs = [-0.98, -0.5, -0.02, 0.46, 0.94];
+    const platos = [[-0.45, -0.3], [0.15, -0.3], [0.75, -0.3]];
+    const porciones = angs.map((a, k) => ({ id: 'r' + a, tipo: 'porcion', datos: { ang: a, R: 0.195, tono: k % 2 }, home: [xs[k], 0.36], rot: 0, destinos: null }));
+    const pasos = {
+      mapa: { id: 'e5a', conceptos: [], porColocacion: true, necesarios: 4, instr: 'e5Hacer',
+        piezas: [0, 1, 2, 3].map((q) => ({ id: 'mapa' + q, tipo: 'mapa', datos: { q }, home: homesM[q], rot: rnd(-0.3, 0.3), destinos: ['q' + q] })),
+        ranuras: [0, 1, 2, 3].map((q) => ({ id: 'q' + q, pos: [F[0] + (q % 2 ? 0.14 : -0.14), F[1] + (q < 2 ? -0.14 : 0.14)], r: 0.06, anillo: 0.1, y: 0.012, rot: 0, err: 'errMapa', acepta: (p) => p.tipo === 'mapa' && p.datos.q === q })) }
+    };
+    pedidos.forEach((pd, k) => {
+      pasos['ped' + k] = { id: 'e5p' + k, conceptos: [pd.c], porColocacion: false, necesarios: 1, instr: pd.voz,
+        piezas: porciones.map((s) => Object.assign({}, s, { destinos: s.datos.ang === pd.ang ? ['pl' + k] : null })),
+        ranuras: [{ id: 'pl' + k, pos: platos[k], r: 0.12, anillo: 0.24, y: 0.02, rot: 0, acepta: esPorcion(pd.ang) }] };
+    });
+    P[5] = { F, pedidos, platos, pasos };
+  }
+  return P;
+}
+
+/* ===================== 23. ESTACIONES (guion de cada reto: VER, HACER, ENTENDER, NOMBRAR) ===================== */
+function puntoMesa(i, lx, lz) { const v = aMundo(i, lx, lz, new V3()); v.y = CONFIG.MESA_H; return v; }
+function bienAzar() { return 'bien' + (1 + Math.floor(Math.random() * 4)); }
+function setObjetivo(clave) { $('objetivo').innerHTML = (ICO[clave] || ICO.estrella)().replace(/#fff3dc/g, '#9a6234'); }
+function prepararEstacion(i) {
+  limpiarEstacion();
+  const plan = G.planes[i];
+  (plan.props || []).forEach((sp) => EST.props.set(sp.id, crearProp(i, sp)));
+  if (plan.cajita) EST.props.set('cajita', crearProp(i, { id: 'cajita', tipo: 'cajita', pos: plan.cajita, datos: { color: MESAS[i].color } }));
+}
+function limpiarEstacion() {
+  EST.piezas.forEach((p) => { cancelarAnim(p.anim); scene.remove(p.obj); });
+  EST.ranuras.forEach((r) => scene.remove(r.anillo));
+  EST.props.forEach((o) => { if (o.parent) o.parent.remove(o); }); EST.extras.forEach((o) => { if (o.parent) o.parent.remove(o); });
+  EST.piezas.clear(); EST.ranuras.clear(); EST.props.clear(); EST.extras.length = 0;
+  MATS_PIZZA.forEach((m) => { if (m.map) m.map.dispose(); m.dispose(); }); MATS_PIZZA.length = 0;
+  PASO = null; G.piezas = []; G.ranuras = []; G.pickables.length = 0;
+  DR.sel = null; DR.pieza = null; DR.cand = null; DR.estado = 'IDLE'; FX.haloSel.visible = false; FX.haloPista.visible = false; ocultarMigajas();
+}
+async function llegar(i) {
+  G.estado = i === 0 ? 'TUTORIAL' : 'EST' + i; G.est = i;
+  prepararEstacion(i); G.estacionLista = true; actualizarCandados(); actualizarUI(); setObjetivo('pasos');
+  if (i >= 2) decir('siguiente');
+  if (G.modo !== 'mesa') await esperarSenal('mesa');
+}
+async function cerrarEstacion() {
+  G.estacionLista = false; PASO = null;
+  if (G.modo === 'mesa') await salirMesa();
+  limpiarEstacion();
+}
+// Premio: se abre la cajita y sale una parte del mapa (un cuarto)
+async function premio(i, q) {
+  const caj = EST.props.get('cajita'); if (!caj) return;
+  sonar('pop'); pipoGesto('celebra');
+  await animarP(0.5, (k) => { caj.userData.tapa.rotation.x = -k * 1.9; }, EASE.back);
+  const cw = caj.getWorldPosition(new V3());
+  chispas(cw.x, cw.y + 0.15, cw.z, 30, 0.7);
+  const obj = construirPieza('mapa', { q }); const y0 = cw.y + 0.1;
+  obj.position.set(cw.x, y0, cw.z); obj.rotation.y = MESAS[i].rot; scene.add(obj); EST.extras.push(obj);
+  await animarP(1.0, (k) => { obj.position.y = y0 + k * 0.45; obj.rotation.y = MESAS[i].rot + k * TAU; obj.scale.setScalar(0.5 + k * 0.8); });
+  G.mapa[q] = true; G.piezasMapa++; dibujarMinimapa(q); sonar('campana');
+  await decir('mapa' + G.piezasMapa);
+  await animarP(0.4, (k) => obj.scale.setScalar(Math.max(0.01, 1.3 * (1 - k))));
+  obj.visible = false;
+}
+// 0. Práctica
+async function estacion0() {
+  const i = 0, plan = G.planes[0];
+  mostrarTeclas(); decir('tutCaminar');
+  await llegar(i);
+  setObjetivo('queso'); decir('tutVer');
+  const fin = hacerPaso(i, plan.pasos.e0, { alColocar: async () => { sonar('campana'); pipoGesto('celebra'); chispas(EST.ranuras.get('plato').centro.x, CONFIG.MESA_H + 0.1, EST.ranuras.get('plato').centro.z, 30, 0.7); } });
+  PASO.ocupado = true; await esperar(0.5);
+  await manoDemo(EST.piezas.get('queso').home, EST.ranuras.get('plato').centro); // VER
+  await decir('tutHacer'); if (PASO) PASO.ocupado = false;
+  await fin;
+  await decir('tutBien');
+  await cerrarEstacion();
+}
+// 1. Partes iguales
+async function estacion1() {
+  const i = 1, plan = G.planes[1], rot = MESAS[i].rot, escena = puntoMesa(i, -0.2, 0.05);
+  await llegar(i);
+  setObjetivo('iguales'); await decir('e1Intro');
+  await Promise.all([decir('e1Ver'), separarSuperponer([90, 90, 90, 90], escena, 0.26, rot, 0.3)]);
+  setObjetivo('caja'); decir('e1Hacer');
+  await hacerPaso(i, plan.pasos.e1, {
+    alColocar: async () => { sonar('campana'); await decir(bienAzar()); },
+    alError: async (p) => { const pt = p.datos.partes; decir('errNoIguales'); await compararPartes(Math.max(...pt), Math.min(...pt), escena, 0.26, rot); }
+  });
+  await Promise.all([decir('e1Entender'), separarSuperponer([120, 120, 120], escena, 0.26, rot, 0.3)]);
+  await nombrar('iguales', 'e1Nombre');
+  await premio(i, 0);
+  await cerrarEstacion();
+}
+// 2. La mitad
+async function estacion2() {
+  const i = 2, plan = G.planes[2], rot = MESAS[i].rot, escena = puntoMesa(i, 0.03, 0.15);
+  await llegar(i);
+  setObjetivo('mitad'); await decir('e2Intro');
+  await Promise.all([decir('e2Ver'), separarSuperponer([180, 180], escena, 0.26, rot, 0.35)]);
+  setObjetivo('cuchilla'); decir('e2Hacer');
+  const pzOk = plan.pizzas[plan.ok], fiOk = Math.atan2(-Math.cos(pzOk.alfa), -Math.sin(pzOk.alfa)), cOk = puntoMesa(i, pzOk.x, pzOk.z);
+  await hacerPaso(i, plan.pasos.corte, {
+    alColocar: async (p) => {
+      const y = p.obj.position.y;
+      for (let n = 0; n < 2; n++) { await animarP(0.15, (k) => { p.obj.position.y = y + k * 0.08; }); sonar('chop'); await animarP(0.12, (k) => { p.obj.position.y = y + 0.08 * (1 - k); }); }
+      EST.props.get('pz' + plan.ok).visible = false;
+      const nx = Math.cos(rot + fiOk), nz = -Math.sin(rot + fiOk);
+      [1, -1].forEach((lado) => {
+        const m = construirProp('mitadCortada', { R: plan.R * 0.97, lado }); m.position.set(cOk.x, CONFIG.MESA_H, cOk.z); m.rotation.y = rot + fiOk; scene.add(m); EST.extras.push(m);
+        animar(0.4, (k) => m.position.set(cOk.x + nx * lado * 0.015 * k, CONFIG.MESA_H, cOk.z + nz * lado * 0.015 * k));
+      });
+      await animarP(0.3, (k) => p.obj.scale.setScalar(Math.max(0.01, 1 - k))); p.obj.visible = false;
+      sonar('campana'); chispas(cOk.x, CONFIG.MESA_H + 0.1, cOk.z, 25, 0.6); await decir('e2Bien');
+    },
+    alError: async (p, r) => {
+      const pz = plan.pizzas[+r.id.slice(2)], fi = Math.atan2(-Math.cos(pz.alfa), -Math.sin(pz.alfa));
+      decir('errNoMitad'); await compararSegmentos(pz.dFrac * 0.26, 0.26, escena, rot + fi);
+    }
+  });
+  await Promise.all([decir('e2Entender'), compararSegmentos(0, 0.26, escena, rot + fiOk)]);
+  await nombrar('mitad', 'e2Nombre');
+  setObjetivo('ingred'); decir('e2Ingred');
+  await hacerPaso(i, plan.pasos.ingred, { alColocar: async (p) => { sonar('plop'); await animarP(0.25, (k) => p.obj.scale.set(1 + 0.3 * k, 1, 1 + 0.3 * k)); } });
+  pipoGesto('celebra'); await decir('e2Fin');
+  await premio(i, 1);
+  await cerrarEstacion();
+}
+// 3. El cuarto
+async function estacion3() {
+  const i = 3, plan = G.planes[3], rot = MESAS[i].rot, escena = puntoMesa(i, -0.45, 0.15), bandeja = puntoMesa(i, plan.T[0], plan.T[1]);
+  await llegar(i);
+  setObjetivo('cuarto'); await decir('e3Intro');
+  await Promise.all([decir('e3Ver'), separarSuperponer([90, 90, 90, 90], escena, 0.26, rot, 0.3)]);
+  decir('e3Hacer');
+  await hacerPaso(i, plan.pasos.cuartos, {
+    alColocar: async () => { sonar('campana'); if (PASO && PASO.colocados < 4) await decir('e3Bien'); },
+    alError: async (p) => { const a = p.datos.ang; decir(a > 90 ? 'errGrande' : 'errChica'); await compararPartes(90, a, escena, 0.26, rot); }
+  });
+  await Promise.all([decir('e3Entender'), separarSuperponer([90, 90, 90, 90], bandeja, 0.26, rot, 0.32)]);
+  await nombrar('cuarto', 'e3Nombre');
+  setObjetivo('champi'); decir('e3Champi');
+  await hacerPaso(i, plan.pasos.champi, { alColocar: async () => { sonar('plop'); } });
+  setObjetivo('horno'); sonar('fuum'); pipoGesto('celebra');
+  animar(1.6, (k) => { LUZ.horno.distance = 5 + Math.sin(k * PI) * 4; }, EASE.lineal);
+  await decir('e3Fin');
+  await premio(i, 2);
+  await cerrarEstacion();
+}
+// Dos cuartos caben en una mitad (ENTENDER de la comparación)
+async function dosCuartosEnMitad(centro, R, rot) {
+  const y0 = centro.y + 0.3, dc90 = centroideSector(PI / 2, R), dc180 = centroideSector(PI, R); escenario(centro, y0, R, true);
+  FX.fantasma.geometry = geoPorcion(180, R, 0, false); FX.fantasma.position.set(centro.x + Math.sin(rot) * dc180, y0 + 0.05, centro.z + Math.cos(rot) * dc180); FX.fantasma.rotation.set(0, rot, 0);
+  FX.fantasma.visible = true; FX.fantasma.scale.setScalar(1);
+  const qs = [FX.demo[0], FX.demo[1]];
+  qs.forEach((m, k) => { const f = rot + (k ? PI / 4 : -PI / 4); m.geometry = geoPorcion(90, R, k, true); m.rotation.set(0, f, 0); m.userData.f = f; m.visible = true; });
+  await animarP(0.9, (k) => qs.forEach((m, j) => { const kk = clamp(k * 2 - j, 0, 1); m.position.set(centro.x + Math.sin(m.userData.f) * dc90, y0 + 0.4 * (1 - kk), centro.z + Math.cos(m.userData.f) * dc90); m.scale.setScalar(Math.max(0.01, kk)); }), EASE.lineal);
+  sonar('campana'); await esperar(1.6);
+  FX.fantasma.visible = false; qs.forEach((m) => { m.visible = false; m.scale.setScalar(1); }); escenario(centro, 0, 0, false);
+}
+// 4. Comparar y el tercio
+async function estacion4() {
+  const i = 4, plan = G.planes[4], rot = MESAS[i].rot, escena = puntoMesa(i, -0.1, 0.1);
+  await llegar(i);
+  setObjetivo('raton'); PJ.ratones.forEach((r) => { r.salto = 0.6; }); await decir('e4Intro');
+  setObjetivo('comparar');
+  await Promise.all([decir('e4Ver'), compararPartes(180, 90, escena, 0.26, rot)]);
+  setObjetivo('estrella'); decir('e4Hacer');
+  await hacerPaso(i, plan.pasos.comparar, {
+    alColocar: async () => { sonar('campana'); await decir('e4Bien'); },
+    alError: async () => { decir('errChica'); await compararPartes(180, 90, escena, 0.26, rot); }
+  });
+  await Promise.all([decir('e4Entender'), dosCuartosEnMitad(escena, 0.26, rot)]);
+  await nombrar('mitad', 'e2Nombre');
+  // se retiran los platos de la comparación
+  const fuera = ['platoM', 'platoC', 'fijaM', 'fijaC'].map((id) => EST.props.get(id)).concat([EST.piezas.get('estrella').obj]);
+  await animarP(0.35, (k) => fuera.forEach((o) => o.scale.setScalar(Math.max(0.01, 1 - k))));
+  fuera.forEach((o) => { o.visible = false; });
+  if (G.opc.tercio) {
+    setObjetivo('tercio');
+    await Promise.all([decir('e4TVer'), separarSuperponer([120, 120, 120], escena, 0.26, rot, 0.3)]);
+    plan.platos.forEach((pp, k) => { const o = crearProp(i, { tipo: 'plato', pos: pp, datos: { R: 0.17 } }); EST.props.set('pr' + k, o); popIn(o); });
+    setObjetivo('raton'); decir('e4THacer');
+    await hacerPaso(i, plan.pasos.tercio, {
+      alColocar: async (p, r) => { PJ.ratones[+r.id.slice(1)].salto = 0.8; sonar('campana'); await decir('gracias'); },
+      alError: async () => { await decir('errLleno'); }
+    });
+    await Promise.all([decir('e4TEntender'), separarSuperponer([120, 120, 120], escena, 0.26, rot, 0.3)]);
+    await nombrar('tercio', 'e4TNombre');
+  }
+  await premio(i, 3);
+  await cerrarEstacion();
+}
+// Pictograma de pedido (sprite con canvas)
+function spritePedido(ang) {
+  const t = hacerTex(128, 128, (x) => {
+    x.fillStyle = '#fff3dc'; x.beginPath(); x.arc(64, 64, 62, 0, TAU); x.fill();
+    x.fillStyle = '#e3a35a'; x.beginPath(); x.arc(64, 64, 52, 0, TAU); x.fill();
+    const n = Math.round(360 / ang);
+    for (let k = 0; k < n; k++) {
+      x.fillStyle = k === 0 ? '#e2553f' : '#f6c445'; x.beginPath(); x.moveTo(64, 64);
+      x.arc(64, 64, 44, -PI / 2 + k * ang * DEG, -PI / 2 + (k + 1) * ang * DEG); x.closePath(); x.fill();
+      x.strokeStyle = '#6b3e26'; x.lineWidth = 4; x.stroke();
+    }
+  }, false);
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); s.scale.setScalar(0.24); s.renderOrder = 5; return s;
+}
+// 5. Mesa del tesoro
+async function estacion5() {
+  const i = 5, plan = G.planes[5], rot = MESAS[i].rot, escena = puntoMesa(i, 0.1, 0.12);
+  await llegar(i);
+  setObjetivo('mapa');
+  const marco = crearProp(i, { tipo: 'marco', pos: plan.F }); EST.props.set('marco', marco);
+  await decir('e5Intro');
+  const fin = hacerPaso(i, plan.pasos.mapa, { alColocar: async () => { sonar('campana'); }, alError: async () => { await decir('errMapa'); } });
+  PASO.ocupado = true; await esperar(0.4);
+  await manoDemo(EST.piezas.get('mapa0').home, EST.ranuras.get('q0').centro); // VER
+  decir('e5Hacer'); if (PASO) PASO.ocupado = false;
+  await fin;
+  // ENTENDER: las 4 partes se separan y se superponen (son iguales)
+  const mp = [0, 1, 2, 3].map((q) => EST.piezas.get('mapa' + q).obj), ini = mp.map((o) => o.position.clone()), cF = puntoMesa(i, plan.F[0], plan.F[1]);
+  decir('e5Entender');
+  await animarP(0.6, (k) => mp.forEach((o, j) => { o.position.set(lerp(ini[j].x, ini[j].x + (ini[j].x - cF.x) * 0.6, k), ini[j].y + k * 0.25, lerp(ini[j].z, ini[j].z + (ini[j].z - cF.z) * 0.6, k)); }));
+  await animarP(0.8, (k) => mp.forEach((o, j) => { const sx = ini[j].x + (ini[j].x - cF.x) * 0.6, sz = ini[j].z + (ini[j].z - cF.z) * 0.6; o.position.set(lerp(sx, cF.x, k), ini[j].y + 0.25 + j * 0.03 * k, lerp(sz, cF.z, k)); }));
+  sonar('campana'); await esperar(1.2);
+  await animarP(0.6, (k) => mp.forEach((o, j) => { o.position.set(lerp(cF.x, ini[j].x, k), ini[j].y + (0.25 + j * 0.03) * (1 - k), lerp(cF.z, ini[j].z, k)); }));
+  await nombrar('entero', 'e5Nombre');
+  // el mapa vuela a la puerta de la bodega
+  scene.attach(marco);
+  const vuela = mp.concat([marco]), ini2 = vuela.map((o) => o.position.clone());
+  await animarP(0.9, (k) => vuela.forEach((o, j) => { o.position.set(lerp(ini2[j].x, 6.8, k), lerp(ini2[j].y, 1.6, k) + Math.sin(k * PI) * 0.4, lerp(ini2[j].z, 2.4, k)); o.scale.setScalar(Math.max(0.01, 1 - k)); }));
+  vuela.forEach((o) => { o.visible = false; });
+  setObjetivo('candado'); await decir('e5Bodega');
+  // RONDA DEL TESORO
+  const sprites = [];
+  plan.pedidos.forEach((pd, k) => {
+    const o = crearProp(i, { tipo: 'plato', pos: plan.platos[k], datos: { R: 0.22 } }); EST.props.set('pl' + k, o); popIn(o);
+    const s = spritePedido(pd.ang), w = puntoMesa(i, plan.platos[k][0], plan.platos[k][1]); s.position.set(w.x, CONFIG.MESA_H + 0.32, w.z); scene.add(s); EST.extras.push(s); sprites.push(s);
+  });
+  await decir('e5Ronda');
+  for (let k = 0; k < plan.pedidos.length; k++) {
+    const pd = plan.pedidos[k];
+    sprites.forEach((s, j) => { s.material.opacity = j === k ? 1 : 0.35; s.material.transparent = true; s.scale.setScalar(j === k ? 0.3 : 0.18); });
+    setObjetivo(pd.c); decir(pd.voz);
+    await hacerPaso(i, plan.pasos['ped' + k], {
+      alColocar: async () => { sonar('campana'); abrirCandado(k); await decir('pedBien'); },
+      alError: async (p) => { const a = p.datos.ang; decir(a > pd.ang ? 'errGrande' : 'errChica'); await compararPartes(pd.ang, a, escena, 0.26, rot); }
+    });
+  }
+  for (let k = plan.pedidos.length; k < 3; k++) abrirCandado(k);
+  sprites.forEach((s) => { s.visible = false; });
+  await finalJuego();
+}
+function abrirCandado(k) {
+  const l = MUNDO.locks[k]; if (!l || !l.visible) return;
+  const y0 = l.position.y; sonar('pop'); chispas(l.position.x, y0, l.position.z, 20, 0.6);
+  animar(0.8, (t) => { l.position.y = y0 + Math.sin(t * PI) * 0.3 - t * t * y0; l.position.x = 6.86 - t * 0.6; l.rotation.z = t * 4; }, EASE.lineal, () => { l.visible = false; });
+}
+
+/* ===================== 24. FLUJO: MENU → INTRO → TUTORIAL → EST1..EST5 → RESULTADO ===================== */
+const GUION = [intro, estacion0, estacion1, estacion2, estacion3, estacion4, estacion5];
+async function correr(desde) { for (let k = desde; k < GUION.length; k++) { G.guion = k; await GUION[k](); } }
+function jugar() {
+  if (G.estado !== 'MENU') return;
+  let n = ($('nombre').value || '').trim().replace(/\s+/g, ' ').slice(0, 14);
+  G.nombre = n ? n.charAt(0).toUpperCase() + n.slice(1) : 'Ayudante';
+  G.opc.clic = $('oClic').checked; G.opc.menosEfectos = $('oEfectos').checked; G.opc.voz = $('oVoz').checked; G.opc.tercio = $('oTercio').checked;
+  if (G.opc.menosEfectos) PART.limite = 30;
+  iniciarAudio(); iniciarMusica();
+  try { if (G.opc.voz && 'speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { }
+  G.planes = crearPlanes(); G.tInicio = G.t;
+  $('menu').classList.add('oculto'); $('hud').classList.remove('oculto');
+  canvas.focus();
+  correr(0);
+}
+async function intro() {
+  G.estado = 'INTRO'; G.modo = 'cine'; actualizarUI(); setObjetivo('mapa');
+  camera.position.set(0, CONFIG.OJOS, 3.9); camera.lookAt(0, 1.85, -4.9);
+  const P = PJ.pipo; P.modo = 'intro'; P.pos.set(-2.6, 0, 2.2);
+  const dolly = animar(14, (k) => { camera.position.z = 3.9 - k * 1.8; camera.lookAt(0, 1.85, -4.9); }, EASE.suave);
+  await esperar(0.6);
+  await decir('intro1'); await decir('intro2');
+  await decir('intro3'); await decir('intro4');
+  cancelarAnim(dolly); pipoSaltar(new V3(0, 0, 1.0), 0.7, 'intro');
+  camTmp.position.copy(camera.position); camTmp.lookAt(0, 0.5, 1.0);
+  await moverCamara(camTmp.position, camTmp.quaternion, 0.8);
+  pipoGesto('celebra'); await decir('pipoHola');
+  terminarIntro();
+}
+function terminarIntro() {
+  anims.forEach((a) => { if (a !== PJ.pipo.salto) a.muerto = true; });
+  JUG.x = 0; JUG.z = Math.max(camera.position.z, 2.2); JUG.yaw = 0; JUG.pitch = 0; JUG.suprimir = false;
+  PJ.pipo.modo = 'suelo'; G.modo = 'caminar';
+}
+function saltarIntro() { if (G.estado !== 'INTRO') return; cancelarHilos(); try { speechSynthesis.cancel(); } catch (e) { } terminarIntro(); PJ.pipo.pos.set(0, 0, 1.0); correr(1); }
+function mostrarTeclas() {
+  const el = $('teclas'); el.innerHTML = ICO.teclas() + ICO.flechas(); el.classList.remove('oculto');
+  setTimeout(() => el.classList.add('oculto'), 6000);
+}
+async function finalJuego() {
+  G.estado = 'EST5'; G.estacionLista = false; PASO = null; deseleccionar();
+  G.modo = 'cine'; actualizarUI(); setObjetivo('candado');
+  for (let k = 0; k < 3; k++) abrirCandado(k);
+  pipoSaltar(new V3(5.55, CONFIG.MESA_H, 1.45), 0.6, 'intro');
+  camTmp.position.set(2.4, 2.0, 0.2); camTmp.lookAt(6.0, 1.15, 0.6);
+  moverCamara(camTmp.position, camTmp.quaternion, 1.4);
+  sonar('fuum');
+  await animarP(1.4, (k) => { MUNDO.pivote.rotation.y = -1.9 * k; LUZ.bodega.intensity = 1.8 * k; });
+  await decir('final1');
+  // Pizza Dorada (4 cuartos dorados)
+  const pd = new THREE.Group(), giro = new THREE.Group(), R = 0.32, dc = centroideSector(PI / 2, R), cuartos = [];
+  for (let k = 0; k < 4; k++) { const f = PI / 4 + k * PI / 2, m = new THREE.Mesh(geoPorcion(90, R, 2, false), M.dorado); m.position.set(Math.sin(f) * (dc + 0.01), 0, Math.cos(f) * (dc + 0.01)); m.rotation.y = f; giro.add(m); cuartos.push(m); }
+  pd.add(giro); pd.rotation.z = 0.85; // inclinada hacia la cámara para que se vea
+  pd.position.set(7.6, 1.0, 2.4); scene.add(pd); EST.extras.push(pd);
+  PJ.gino.visible = PJ.ginoSombra.visible = true; PJ.gino.position.set(7.6, 0, 2.4);
+  animar(1.6, (k) => { PJ.gino.position.set(lerp(7.6, 6.5, k), Math.abs(Math.sin(k * 12)) * 0.04, lerp(2.4, 3.25, k)); PJ.gino.rotation.y = -PI / 2 - 0.5; PJ.ginoSombra.position.set(PJ.gino.position.x, 0.006, PJ.gino.position.z); });
+  await animarP(1.8, (k) => { pd.position.set(lerp(7.6, 5.6, k), lerp(1.0, 1.75, k) + Math.sin(k * PI) * 0.3, lerp(2.4, 1.3, k)); giro.rotation.y = k * TAU * 1.5; });
+  sonar('fanfarria'); chispas(5.6, 1.8, 1.3, 120, 1.2);
+  await decir('final2');
+  // la Pizza Dorada se parte en 4 cuartos iguales: uno para cada amigo
+  const destinos = [PJ.pipo.pos.clone().add(new V3(0, 0.6, 0))].concat(PJ.ratones.map((r) => r.m.position.clone().add(new V3(0, 0.75, 0))));
+  cuartos.forEach((m) => scene.attach(m));
+  const ini = cuartos.map((m) => m.position.clone());
+  await animarP(1.4, (k) => cuartos.forEach((m, j) => { m.position.set(lerp(ini[j].x, destinos[j].x, k), lerp(ini[j].y, destinos[j].y, k) + Math.sin(k * PI) * 0.6, lerp(ini[j].z, destinos[j].z, k)); m.scale.setScalar(1 - 0.4 * k); }));
+  cuartos.forEach((m) => EST.extras.push(m));
+  PJ.ratones.forEach((r) => { r.salto = 1.5; }); PJ.pipo.baile = true; chispas(6, 1.6, -1.5, 60, 1);
+  await decir('final3');
+  await esperar(0.8);
+  mostrarResultado();
+}
+function textoResultado() {
+  const seg = Math.max(0, Math.round(G.tFin - G.tInicio)), t = `${Math.floor(seg / 60)}:${String(seg % 60).padStart(2, '0')}`;
+  const est = G.pistas === 0 ? 3 : G.pistas <= 2 ? 2 : 1, c = G.conceptos;
+  const f = (k) => (k === 'tercio' && !G.opc.tercio) ? 'tercio -' : `${k} ${c[k][0]}/${c[k][1]}`;
+  return { t, est, linea: `${G.nombre} | ${t} | ${est} ${est === 1 ? 'estrella' : 'estrellas'} | ${f('iguales')}, ${f('mitad')}, ${f('cuarto')}, ${f('tercio')} | ${G.pistas} ${G.pistas === 1 ? 'pista' : 'pistas'}` };
+}
+function mostrarResultado() {
+  G.estado = 'RESULTADO'; G.tFin = G.t; actualizarUI();
+  const r = textoResultado();
+  $('resNombre').textContent = G.nombre;
+  $('resTiempo').innerHTML = ICO.reloj() + ' ' + r.t;
+  $('estrellas').innerHTML = [1, 2, 3].map((k) => (k <= r.est ? ICO.estrella() : ICO.estrellaGris())).join('');
+  const lista = [['iguales', 'iguales', '='], ['mitad', 'mitad', '1/2'], ['cuarto', 'cuarto', '1/4']].concat(G.opc.tercio ? [['tercio', 'tercio', '1/3']] : []);
+  $('aprendi').innerHTML = lista.map(([k, w, fr]) => {
+    const [ok, tot] = G.conceptos[k];
+    return `<div class="concepto">${ICO[k]()}<div>${w}</div><div class="frac">${fr}</div><div class="puntos">${Array.from({ length: tot }, (_, j) => `<b class="${j < ok ? 'si' : ''}"></b>`).join('')}</div></div>`;
+  }).join('');
+  G.lineaResultado = r.linea; window.__resultado = r.linea;
+  $('resultado').classList.remove('oculto');
+  sonar('fanfarria'); decir('resultado');
+}
+async function copiarResultado() {
+  const txt = G.lineaResultado || textoResultado().linea; let ok = false;
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); ok = true; } } catch (e) { }
+  if (!ok) {
+    const ta = $('copiaTxt'); ta.value = txt; ta.classList.remove('oculto'); ta.focus(); ta.select();
+    try { ok = document.execCommand('copy'); } catch (e) { }
+  }
+  $('bCopiar').innerHTML = (ok ? ICO.brillo() : ICO.copiar()) + (ok ? ' ¡Listo!' : ' Copiar');
+  sonar(ok ? 'campana' : 'tic');
+}
+// Mayús+N: salta la estación activa (para el docente / pruebas)
+function saltarEstacion() {
+  const k = G.guion;
+  if (G.estado === 'INTRO') { saltarIntro(); return; }
+  if (k == null || k < 1 || k > 6 || G.estado === 'RESULTADO') return;
+  cancelarHilos(); try { speechSynthesis.cancel(); } catch (e) { }
+  cancelarArrastre(); cancelarAnim(animCam);
+  const est = k - 1;
+  if (est >= 1 && est <= 4 && !G.mapa[est - 1]) { G.mapa[est - 1] = true; G.piezasMapa++; dibujarMinimapa(est - 1); }
+  limpiarEstacion(); G.estacionLista = false; $('nombreFieltro').classList.add('oculto');
+  if (G.modo !== 'caminar' && G.modo !== 'cine') { G.modo = 'caminar'; PJ.pipo.modo = 'suelo'; PJ.pipo.pos.y = 0; }
+  if (est === 5) finalJuego(); else correr(k + 1);
+}
+
+/* ===================== 25. INTERFAZ (HUD, botones, minimapa, pausa) ===================== */
+function actualizarUI() {
+  const jugando = G.estado !== 'MENU' && G.estado !== 'RESULTADO';
+  $('hud').classList.toggle('oculto', G.estado === 'MENU');
+  $('pad').classList.toggle('oculto', !(G.modo === 'caminar' && G.estacionLista && jugando));
+  $('bMesa').classList.toggle('oculto', !(G.modo === 'caminar' && G.estacionLista && jugando));
+  $('bVolver').classList.toggle('oculto', !(G.modo === 'mesa' && jugando));
+  $('bSaltar').classList.toggle('oculto', G.estado !== 'INTRO');
+  $('objetivo').classList.toggle('oculto', !jugando); $('minimapa').classList.toggle('oculto', !jugando);
+  $('sub').classList.toggle('oculto', G.estado === 'MENU');
+  if (G.modo === 'mesa' || G.modo === 'cine') TECLAS.KeyW = TECLAS.KeyA = TECLAS.KeyS = TECLAS.KeyD = TECLAS.ArrowLeft = TECLAS.ArrowRight = TECLAS.ArrowUp = TECLAS.ArrowDown = false;
+}
+function dibujarMinimapa(nuevo) {
+  const cv = $('mm'), x = cv.getContext('2d');
+  x.fillStyle = '#fbecd2'; x.fillRect(0, 0, 128, 128);
+  for (let q = 0; q < 4; q++) {
+    const dx = (q % 2) * 64, dy = q < 2 ? 0 : 64;
+    if (G.mapa[q] && MAPA_CANVAS) x.drawImage(MAPA_CANVAS, (q % 2) * 128, q < 2 ? 0 : 128, 128, 128, dx, dy, 64, 64);
+    else { x.fillStyle = '#ead2a8'; x.fillRect(dx + 4, dy + 4, 56, 56); }
+  }
+  x.setLineDash([6, 5]); x.strokeStyle = '#9a6234'; x.lineWidth = 3;
+  x.strokeRect(2, 2, 124, 124); x.beginPath(); x.moveTo(64, 0); x.lineTo(64, 128); x.moveTo(0, 64); x.lineTo(128, 64); x.stroke(); x.setLineDash([]);
+  if (nuevo != null) { const el = $('minimapa'); el.classList.add('late'); setTimeout(() => el.classList.remove('late'), 2200); }
+}
+function pintarBotonesMudo() { const h = G.mudo ? ICO.mudo() : ICO.sonido(); $('bMudo').innerHTML = h; $('bMudo2').innerHTML = h; }
+function togglePausa(v) {
+  if (G.estado === 'MENU' || G.estado === 'RESULTADO') return;
+  const nuevo = v == null ? !G.pausa : v; if (nuevo === G.pausa) return;
+  G.pausa = nuevo;
+  if (G.pausa) { G.estadoPrevio = G.estado; G.estado = 'PAUSA'; cancelarArrastre(); try { speechSynthesis.cancel(); } catch (e) { } }
+  else { G.estado = G.estadoPrevio || G.estado; }
+  $('pausa').classList.toggle('oculto', !G.pausa);
+  Object.keys(PAD).forEach((k) => { PAD[k] = false; });
+}
+function prepararUI() {
+  $('bJugar').innerHTML = ICO.play() + ' JUGAR';
+  $('bOpciones').innerHTML = ICO.engrane();
+  $('icoNombre').innerHTML = ICO.lapiz(); $('menuPipo').innerHTML = ICO.pipo();
+  $('icoClic').innerHTML = ICO.clic(); $('icoEfectos').innerHTML = ICO.efectos(); $('icoVoz').innerHTML = ICO.vozIco(); $('icoTercio').innerHTML = ICO.tercio();
+  $('bPausa').innerHTML = ICO.pausa(); pintarBotonesMudo();
+  $('bRepetir').innerHTML = ICO.repetir(); $('bVolver').innerHTML = ICO.volver(); $('bMesa').innerHTML = ICO.pasos() + ICO.mesa();
+  $('bSaltar').innerHTML = ICO.saltar(); $('icoPausaGrande').innerHTML = ICO.pausa().replace(/#fff3dc/g, '#fff3dc');
+  $('bSeguir').innerHTML = ICO.play(); $('bMenu').innerHTML = ICO.casa();
+  $('bCopiar').innerHTML = ICO.copiar() + ' Copiar'; $('bOtraVez').innerHTML = ICO.otraVez();
+  document.querySelectorAll('#pad [data-mov]').forEach((b) => {
+    const mov = b.dataset.mov; b.innerHTML = ICO[mov]();
+    const on = (e) => { e.preventDefault(); PAD[mov] = true; try { b.setPointerCapture(e.pointerId); } catch (er) { } JUG.auto = false; };
+    const off = () => { PAD[mov] = false; };
+    b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off);
+  });
+  const clic = (id, fn) => $(id).addEventListener('click', (e) => { e.preventDefault(); fn(); });
+  clic('bJugar', jugar); clic('bOpciones', () => $('opciones').classList.toggle('oculto'));
+  clic('bVolver', salirMesa); clic('bMesa', irALaMesa); clic('bPausa', () => togglePausa());
+  clic('bMudo', () => setMudo(!G.mudo)); clic('bMudo2', () => setMudo(!G.mudo)); clic('bSeguir', () => togglePausa(false));
+  clic('bMenu', () => location.reload()); clic('bRepetir', repetirUltimo); clic('bSaltar', saltarIntro);
+  clic('bCopiar', copiarResultado); clic('bOtraVez', () => location.reload());
+  $('nombre').addEventListener('keydown', (e) => { if (e.key === 'Enter') jugar(); e.stopPropagation(); });
+  // Parámetros del link: ?voz=0&efectos=1&clic=1 (&tercio=0 &debug=1)
+  const q = new URLSearchParams(location.search);
+  if (q.get('voz') === '0') $('oVoz').checked = false;
+  if (q.get('efectos') === '1') $('oEfectos').checked = true;
+  if (q.get('clic') === '1') $('oClic').checked = true;
+  if (q.get('tercio') === '0') $('oTercio').checked = false;
+  G.debug = q.get('debug') === '1';
+  // Teclado
+  window.addEventListener('keydown', (e) => {
+    if (e.target && e.target.id === 'nombre') return;
+    if (e.code.startsWith('Arrow') || e.code === 'Space') e.preventDefault();
+    if (e.code === 'Escape') { if (DR.estado === 'DRAGGING') { cancelarArrastre(); return; } if (DR.sel) { deseleccionar(); return; } togglePausa(); return; }
+    if (e.code === 'KeyP') { togglePausa(); return; }
+    if (e.code === 'KeyM') { setMudo(!G.mudo); return; }
+    if (G.debug && e.code === 'KeyG') { $('debug').classList.toggle('oculto'); return; }
+    if (G.debug && e.code === 'KeyT') { autotest(); return; }
+    if (G.debug && e.code === 'KeyN' && e.shiftKey) { saltarEstacion(); return; }
+    if (G.modo === 'caminar' && !G.pausa) { TECLAS[e.code] = true; if (/Key[WASD]|Arrow/.test(e.code)) JUG.auto = false; }
+  });
+  window.addEventListener('keyup', (e) => { TECLAS[e.code] = false; });
+  window.addEventListener('blur', () => { cancelarArrastre(); Object.keys(TECLAS).forEach((k) => { TECLAS[k] = false; }); Object.keys(PAD).forEach((k) => { PAD[k] = false; }); });
+  // Arrastre sobre el canvas (Pointer Events + captura, touch-action: none)
+  canvas.addEventListener('pointerdown', onDown); canvas.addEventListener('pointermove', onMove); canvas.addEventListener('pointerup', onUp);
+  canvas.addEventListener('pointercancel', () => cancelarArrastre());
+  canvas.addEventListener('lostpointercapture', (e) => { if (DR.estado === 'DRAGGING' && e.pointerId === DR.pid) cancelarArrastre(); });
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+let tRecordar = 0;
+function recordatorios() {
+  if (G.modo === 'caminar' && G.estacionLista && JUG.quieto > 15 && G.t > tRecordar && !(hablandoHasta > G.t)) {
+    tRecordar = G.t + 25; decir('tutCaminar'); $('bMesa').classList.add('late');
+  }
+  if (G.modo !== 'caminar') $('bMesa').classList.remove('late');
+}
+function confetiFrente(n) {
+  camera.getWorldDirection(_v1); chispas(camera.position.x + _v1.x * 1.4, camera.position.y + _v1.y * 1.4 - 0.1, camera.position.z + _v1.z * 1.4, n, 0.8);
+}
+
+/* ===================== 26. PRUEBAS INTEGRADAS (G: depuración, T: autotest, Mayús+N: saltar) ===================== */
+let tDebug = 0;
+function actualizarDebug(dt) {
+  tDebug += dt; if (tDebug < 0.25 || $('debug').classList.contains('oculto')) return; tDebug = 0;
+  const p = DR.pieza || DR.sel; let txt = '';
+  txt += `estado: ${G.estado}  modo: ${G.modo}  arrastre: ${DR.estado}\n`;
+  txt += `paso: ${PASO ? PASO.id + ' (' + PASO.colocados + '/' + PASO.necesarios + ') pista ' + PASO.nivel + ' t=' + PASO.tPista.toFixed(1) : '-'}\n`;
+  if (p) {
+    aLocal(G.est, p.obj.position.x, p.obj.position.z, _loc);
+    let mejor = null, md = Infinity; for (const r of G.ranuras) { if (!r.activa) continue; const d = distRanura(r, p.obj.position.x, p.obj.position.z); if (d < md) { md = d; mejor = r; } }
+    txt += `pieza: ${p.id}  mesa x=${_loc.x.toFixed(2)} z=${_loc.z.toFixed(2)}\n`;
+    txt += `ranura más cercana: ${mejor ? mejor.id : '-'}  d=${isFinite(md) ? md.toFixed(3) : '-'}  radio=${mejor ? radioEncaje(mejor).toFixed(2) : '-'}\n`;
+    const c = findCandidate(p, p.obj.position.x, p.obj.position.z, G.ranuras); txt += `candidata: ${c ? c.id : 'ninguna'}\n`;
+  } else txt += 'pieza: -\n';
+  const inf = renderer.info.render;
+  txt += `fps: ${(G.fps || 0).toFixed(0)}  draw calls: ${inf.calls}  triángulos: ${inf.triangles}  pr: ${G.pr}\n`;
+  txt += `pistas: ${G.pistas}  ${Object.keys(G.conceptos).map((k) => k + ' ' + G.conceptos[k].join('/')).join(', ')}`;
+  $('debug').textContent = txt;
+}
+// Autotest: con findCandidate verifica que cada pieza encaja en su ranura correcta y no en una lejana,
+// que todo cae dentro de la mesa y de la vista, y que se puede completar solo con toca-y-toca.
+function autotest() {
+  const planes = G.planes || crearPlanes(), lineas = []; let pass = 0, fail = 0;
+  const ok = (c, msg) => { if (c) pass++; else { fail++; lineas.push('FAIL ' + msg); } };
+  const res = { tipo: '', ranura: null }, q = new V3();
+  planes.forEach((plan, i) => {
+    const v = vistaMesa(i); camTmp.position.copy(v.pos); camTmp.quaternion.copy(v.quat); camTmp.updateMatrixWorld();
+    const enVista = (x, z, que) => { const w = aMundo(i, x, z, new V3()); q.set(w.x, CONFIG.MESA_H + 0.05, w.z).project(camTmp); ok(Math.abs(q.x) <= 0.95 && q.y > -0.8 && q.y < 0.88, `E${i} ${que} fuera de la vista`); ok(Math.abs(x) <= 1.25 && Math.abs(z) <= 0.66, `E${i} ${que} fuera del tablero`); };
+    Object.keys(plan.pasos).forEach((nom) => {
+      const def = plan.pasos[nom];
+      const ranuras = def.ranuras.map((sp) => {
+        const w = aMundo(i, sp.pos[0], sp.pos[1], new V3()); w.y = CONFIG.MESA_H;
+        const r = { id: sp.id, centro: w, radius: sp.r, capacidad: sp.cap || 1, items: [], grupo: sp.grupo || sp.id, acceptsType: sp.acepta, llenoEsError: !!sp.lleno, bonus: 0, activa: true };
+        r.accepts = (p) => r.acceptsType(p) && r.items.length < r.capacidad; enVista(sp.pos[0], sp.pos[1], 'ranura ' + sp.id); return r;
+      });
+      def.piezas.forEach((sp) => {
+        const w = aMundo(i, sp.home[0], sp.home[1], new V3()), p = { id: sp.id, tipo: sp.tipo, datos: sp.datos || {} };
+        enVista(sp.home[0], sp.home[1], 'pieza ' + sp.id);
+        ok(findCandidate(p, w.x, w.z, ranuras) === null, `E${i} ${sp.id} encaja estando en su lugar de inicio`);
+        if (sp.destinos) {
+          sp.destinos.forEach((id) => {
+            const r = ranuras.find((x) => x.id === id);
+            ok(!!r, `E${i} ${sp.id}: no existe la ranura ${id}`); if (!r) return;
+            const d = decidir(p, r.centro.x, r.centro.z, ranuras, res); // toca-y-toca usa exactamente esto
+            ok(d.tipo === 'encaja' && sp.destinos.indexOf(d.ranura.id) >= 0, `E${i} ${sp.id} no encaja en ${id} (${d.tipo})`);
+            ok(findCandidate(p, r.centro.x, r.centro.z, ranuras) !== null, `E${i} findCandidate(${sp.id}, ${id}) = null`);
+            const dx = w.x - r.centro.x, dz = w.z - r.centro.z, l = Math.hypot(dx, dz) || 1, lejos = radioEncaje(r) + 0.12;
+            const c2 = findCandidate(p, r.centro.x + dx / l * lejos, r.centro.z + dz / l * lejos, ranuras);
+            ok(c2 !== r, `E${i} ${sp.id} encaja en ${id} desde lejos`);
+          });
+        } else {
+          ranuras.forEach((r) => { const d = decidir(p, r.centro.x, r.centro.z, ranuras, res); ok(d.tipo !== 'encaja', `E${i} distractor ${sp.id} encaja en ${r.id}`); });
+        }
+      });
+      // cada ranura necesaria tiene al menos una pieza que la acepta
+      const necesarias = def.necesarios;
+      const aceptadas = def.piezas.filter((sp) => sp.destinos && ranuras.some((r) => r.acceptsType({ tipo: sp.tipo, datos: sp.datos || {} }))).length;
+      ok(aceptadas >= necesarias, `E${i} paso ${def.id}: faltan piezas (${aceptadas}/${necesarias})`);
+    });
+  });
+  // aMundo coincide con el THREE.Group de cada mesa
+  MESAS.forEach((m, i) => [[1.3, 0.7], [-1.3, 0.7], [0.4, -0.5]].forEach(([x, z]) => { const a = aMundo(i, x, z, new V3()), b = m.grupo.localToWorld(new V3(x, 0, z)); ok(Math.abs(a.x - b.x) < 1e-9 && Math.abs(a.z - b.z) < 1e-9, `mesa ${i}: local→mundo no coincide con el grupo`); }));
+  // Matemática del contenido
+  const p1 = planes[1].pasos.e1.piezas;
+  p1.forEach((sp) => { const s = sp.datos.partes.reduce((a, b) => a + b, 0), igual = sp.datos.partes.every((x) => x === sp.datos.partes[0]); ok(s === 360, `pizza ${sp.id} no suma 360`); ok(igual === sp.datos.iguales, `pizza ${sp.id} mal clasificada`); });
+  planes[5].pedidos.forEach((pd) => { const den = { mitad: 2, tercio: 3, cuarto: 4 }[pd.c]; ok(Math.abs(360 / pd.ang - den) < 1e-9, `pedido ${pd.c} con ${pd.ang}°`); });
+  ok(planes[2].pizzas.filter((p) => p.dFrac === 0).length === 1, 'estación 2: debe haber 1 sola línea por el centro');
+  ok(Math.abs(centroideSector(PI, 1) - 4 / (3 * PI)) < 1e-9, 'centroide de la mitad');
+  // Subtítulos de máximo 4 palabras
+  Object.keys(CONTENIDO).forEach((k) => { const n = rellenar(CONTENIDO[k].sub, { n: 'Ana' }).split(/\s+/).filter(Boolean).length; ok(n <= 4, `subtítulo "${k}" tiene ${n} palabras`); });
+  const resumen = `${fail ? 'FAIL' : 'PASS'}  (${pass} comprobaciones correctas, ${fail} fallas)`;
+  window.__autotest = { pass, fail, lineas, resumen };
+  const t = $('toast'); t.textContent = 'AUTOTEST: ' + resumen + (lineas.length ? '\n' + lineas.join('\n') : '\nCada pieza encaja en su ranura correcta y no en una lejana.\nTodo cae dentro de la mesa y de la vista.\nSe puede completar con toca-y-toca.') + '\n\n(clic para cerrar)';
+  t.classList.remove('oculto'); t.onclick = () => t.classList.add('oculto');
+  console.log('AUTOTEST', resumen, lineas);
+  return window.__autotest;
+}
+
+/* ===================== 27. GAME LOOP (dt con tope 0.05 s) Y ARRANQUE ===================== */
+let ultimo = performance.now(), fpsT = 0, fpsN = 0, bajoT = 0;
+function bajarCalidad() {
+  if (G.pr > 0.75) { G.pr = Math.max(0.75, G.pr - 0.25); renderer.setPixelRatio(G.pr); renderer.setSize(innerWidth, innerHeight, false); }
+  PART.limite = Math.max(30, Math.floor(PART.limite / 2));
+}
+function loop(ahora) {
+  requestAnimationFrame(loop);
+  const real = Math.min((ahora - ultimo) / 1000, 0.5); ultimo = ahora;
+  const dt = Math.min(real, 0.05) * (G.debug && G.vel ? G.vel : 1); // G.vel solo para pruebas con ?debug=1
+  fpsT += real; fpsN++;
+  if (fpsT >= 0.5) {
+    G.fps = fpsN / fpsT; fpsT = 0; fpsN = 0;
+    if (!G.pausa && (G.modo === 'caminar' || G.modo === 'mesa')) { bajoT = G.fps < CONFIG.FPS_MIN ? bajoT + 0.5 : 0; if (bajoT >= 3) { bajarCalidad(); bajoT = 0; } }
+  }
+  if (!G.pausa) {
+    G.t += dt;
+    actualizarEsperas(); actualizarAnims(dt); actualizarJugador(dt); actualizarPipo(dt);
+    actualizarArrastre(dt); actualizarPistas(dt); actualizarParticulas(dt); actualizarDecor(dt); recordatorios();
+  }
+  renderer.render(scene, camera);
+  if (G.debug) actualizarDebug(real);
+}
+function init() {
+  crearTexturas(); crearMateriales(); crearRender(); canvas = renderer.domElement;
+  crearMundo(); crearPersonajes(); crearParticulas(); crearEfectos();
+  prepararUI(); prepararVoz(); dibujarMinimapa(); actualizarUI();
+  G.modo = 'menu'; PJ.pipo.pos.set(0, 0, 1.2);
+  window.__juego = { G, DR, PJ, EST, JUG, renderer, findCandidate, decidir, autotest, saltarEstacion, aMundo, aLocal, get PASO() { return PASO; } };
+  if (G.debug) window.__camara = camera;
+  requestAnimationFrame(loop);
+}
+init();
+</script>
+</body>
+</html>
