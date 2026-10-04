@@ -49,7 +49,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f7e2bd;font-family:"B
 #mano{position:fixed;left:0;top:0;width:76px;height:76px;pointer-events:none;z-index:20;transform:translate(-200px,-200px)}
 #mano svg{width:76px;height:76px;filter:drop-shadow(0 4px 3px rgba(80,40,10,.4))}
 /* Letras de fieltro */
-#nombreFieltro{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;gap:10px;align-items:center;pointer-events:none;z-index:15}
+#nombreFieltro{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:10px;align-items:center;pointer-events:none;z-index:15;width:max-content;max-width:96vw}
+#nombreFieltro.largo .letra{font-size:clamp(34px,6.2vmin,70px)}
 .letra{display:inline-flex;align-items:center;justify-content:center;min-width:1.05em;height:1.35em;padding:0 .12em;font-size:clamp(46px,9vmin,96px);font-weight:900;color:var(--crema);background:var(--tomate);border-radius:16px;border:4px dashed rgba(255,243,220,.85);box-shadow:0 0 0 6px var(--tomate),0 10px 0 6px var(--tomate2),0 18px 24px rgba(80,40,10,.35);animation:popLetra .45s cubic-bezier(.3,1.8,.5,1) both}
 .letra.esp{background:transparent;border:none;box-shadow:none;min-width:.4em}
 .fraccion{display:inline-flex;flex-direction:column;align-items:center;margin-left:.35em;font-size:clamp(34px,7vmin,74px);font-weight:900;color:var(--crema);background:var(--turquesa);border-radius:18px;padding:.08em .35em;border:4px dashed rgba(255,243,220,.85);box-shadow:0 0 0 6px var(--turquesa),0 10px 0 6px #23807a;animation:popLetra .5s .5s cubic-bezier(.3,1.8,.5,1) both;line-height:1}
@@ -71,7 +72,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f7e2bd;font-family:"B
 #opciones label{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:bold;background:#fffaf0;border-radius:16px;padding:6px 12px;border:3px dashed #d79a5e;cursor:pointer;min-height:56px}
 #opciones input{width:30px;height:30px;accent-color:var(--tomate)}
 #opciones svg{width:40px;height:40px}
-#niveles{display:flex;gap:18px}
+#niveles{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .nivel{display:flex;align-items:center;gap:10px;min-height:76px;padding:6px 18px 6px 10px;border-radius:22px;background:#fffaf0;border:3px dashed #d79a5e;box-shadow:0 6px 0 #c9a273;font:inherit;font-size:38px;font-weight:900;color:var(--cafe);cursor:pointer}
 .nivel svg{width:58px;height:58px}
 .nivel.sel{background:var(--queso);border-color:var(--tomate);box-shadow:0 0 0 4px var(--tomate),0 6px 0 4px var(--tomate2)}
@@ -129,7 +130,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#f7e2bd;font-family:"B
   <div class="caja">
     <div class="letrero"><h1>El Tesoro<br>del Pizzero</h1></div>
     <div class="filaNombre panel"><span id="icoNombre"></span><input id="nombre" maxlength="14" autocomplete="off" placeholder="Tu nombre" aria-label="Tu nombre"></div>
-    <div id="niveles"><button class="nivel sel" data-nivel="1" aria-label="Nivel 1"></button><button class="nivel" data-nivel="2" aria-label="Nivel 2"></button></div>
+    <div id="niveles"><button class="nivel sel" data-nivel="1" aria-label="Nivel 1"></button><button class="nivel" data-nivel="2" aria-label="Nivel 2"></button><button class="nivel" data-nivel="3" aria-label="Nivel 3"></button></div>
     <button id="bJugar" class="btn verde late"></button>
     <div class="filaMenu"><button id="bSeguirPartida" class="btn turq oculto" aria-label="Seguir partida"></button><button id="bOpciones" class="btn madera" aria-label="Opciones"></button><button id="bDocente" class="btn madera oculto" aria-label="Docente"></button></div>
     <div id="opciones" class="panel oculto">
@@ -350,16 +351,56 @@ const CONTENIDO = {
   // N2-5. Ronda del tesoro con lasaña
   pedLMitad: { quien: 'gino', voz: 'Dame la mitad de la lasaña.', sub: 'Mitad de la lasaña', icono: 'lasana' },
   pedLTercio: { quien: 'gino', voz: 'Dame un tercio de la lasaña.', sub: 'Tercio de la lasaña', icono: 'lasana' },
-  pedLCuarto: { quien: 'gino', voz: 'Dame un cuarto de la lasaña.', sub: 'Cuarto de la lasaña', icono: 'lasana' }
+  pedLCuarto: { quien: 'gino', voz: 'Dame un cuarto de la lasaña.', sub: 'Cuarto de la lasaña', icono: 'lasana' },
+  // ===== NIVEL 3: "El horno grande" (varios pedazos y equivalencia) =====
+  introL3: { quien: 'gino', voz: '¡Bienvenido al horno grande! Hoy usamos varios pedazos.', sub: '¡Varios pedazos!', icono: 'gino' },
+  v1Intro: { voz: 'Algunas pizzas tienen jamón en varios pedazos.', sub: 'Jamón en varios pedazos', icono: 'tresCuartos' },
+  v1Ver: { voz: 'Mira: tres cuartos son tres pedazos de cuatro.', sub: 'Tres de cuatro', icono: 'tresCuartos' },
+  v1Hacer: { voz: 'Pon la estrella en la pizza con tres cuartos de jamón.', sub: 'Estrella a tres cuartos', icono: 'estrella' },
+  v1Bien: { voz: '¡Sí! Tres pedazos de cuatro: tres cuartos.', sub: '¡Tres cuartos!', icono: 'tresCuartos' },
+  errCuenta: { voz: 'Mira. Cuenta los pedazos con jamón.', sub: 'Cuenta los pedazos', icono: 'ojo' },
+  v1Armar: { voz: 'Ahora pon jamón en dos tercios de la pizza.', sub: 'Jamón en dos tercios', icono: 'ingred' },
+  v1Nombre34: { voz: '¡Tres cuartos!', sub: 'Tres cuartos', icono: 'tresCuartos' },
+  v1Nombre23: { voz: '¡Dos tercios!', sub: 'Dos tercios', icono: 'tercio' },
+  q2Intro: { voz: '¿Qué es igual a la mitad? ¡Vamos a ver!', sub: '¿Igual a la mitad?', icono: 'equivale' },
+  q2Ver: { voz: 'Mira: dos cuartos cubren una mitad.', sub: 'Dos cuartos, una mitad', icono: 'equivale' },
+  q2Hacer: { voz: 'Pon la estrella en el plato que tiene lo mismo que la mitad.', sub: 'Igual que la mitad', icono: 'estrella' },
+  q2Bien: { voz: '¡Sí! Dos cuartos es lo mismo que una mitad.', sub: '¡Dos cuartos, mitad!', icono: 'equivale' },
+  q2Lasana: { voz: 'Ahora con lasaña. ¿Cuál es igual a la mitad?', sub: 'Ahora con lasaña', icono: 'lasana' },
+  q2Nombre: { voz: '¡Dos cuartos es igual a un medio!', sub: 'Dos cuartos, un medio', icono: 'equivale' },
+  a3Intro: { voz: 'Arma tres cuartos en la bandeja.', sub: 'Arma tres cuartos', icono: 'tresCuartos' },
+  a3Cuenta: { voz: 'Uno, dos, tres. ¡Tres cuartos!', sub: '¡Tres cuartos!', icono: 'tresCuartos' },
+  a3Tercios: { voz: 'Ahora arma dos tercios en la bandeja.', sub: 'Arma dos tercios', icono: 'tercio' },
+  a3Cuenta2: { voz: 'Uno, dos. ¡Dos tercios!', sub: '¡Dos tercios!', icono: 'tercio' },
+  m4Intro: { voz: 'Tito, Lola y Beto tienen pizza. ¿Quién tiene más?', sub: '¿Quién tiene más?', icono: 'raton' },
+  m4Hacer: { voz: 'Pon la estrella en el plato que tiene más pizza.', sub: 'Estrella: ¿quién tiene más?', icono: 'estrella' },
+  m4Bien: { voz: '¡Sí! Tres cuartos es más que dos cuartos y que un cuarto.', sub: '¡Tres cuartos es más!', icono: 'compara3' },
+  m4Menos: { voz: 'Ahora pon la estrella en el plato que tiene menos pizza.', sub: '¿Quién tiene menos?', icono: 'estrella' },
+  m4Bien2: { voz: '¡Sí! Un tercio es menos que dos tercios.', sub: '¡Un tercio es menos!', icono: 'compara3' },
+  m4Entender: { voz: 'Mira: con pedazos iguales, más pedazos es más pizza.', sub: 'Más pedazos, más pizza', icono: 'compara3' },
+  m4Nombre: { voz: '¡Tres cuartos es más que un cuarto!', sub: 'Tres cuartos es más', icono: 'compara3' },
+  pedTresCuartos: { quien: 'gino', voz: 'Dame tres cuartos.', sub: 'Dame tres cuartos', icono: 'tresCuartos' },
+  pedDosTercios: { quien: 'gino', voz: 'Dame dos tercios.', sub: 'Dame dos tercios', icono: 'tercio' },
+  pedDosCuartos: { quien: 'gino', voz: 'Dame dos cuartos.', sub: 'Dame dos cuartos', icono: 'equivale' },
+  // ===== Repaso automático (cuando un concepto falla dos veces) =====
+  repasoIntro: { voz: '¡Una ronda más para practicar!', sub: '¡Una ronda más!', icono: 'pipo' },
+  repIguales: { voz: 'Dame la pizza con partes iguales.', sub: 'Pizza con partes iguales', icono: 'iguales' },
+  repFalta: { voz: 'Dame el pedazo que falta para la pizza entera.', sub: 'El pedazo que falta', icono: 'entero' },
+  repGrupo: { voz: 'Reparte cuatro aceitunas: la mitad para cada uno.', sub: 'Mitad para cada uno', icono: 'grupo' },
+  repMasGrande: { voz: 'Dame el pedazo más grande.', sub: 'El pedazo más grande', icono: 'estrella' },
+  repasoBien: { voz: '¡Muy bien! ¡Ya lo practicaste!', sub: '¡Ya lo practicaste!', icono: 'pipo' }
 };
 const PALABRAS = { // letras de fieltro de NOMBRAR
   iguales: { txt: 'iguales', frac: null }, mitad: { txt: 'mitad', frac: [1, 2] },
   cuarto: { txt: 'cuarto', frac: [1, 4] }, tercio: { txt: 'tercio', frac: [1, 3] }, entero: { txt: 'entero', frac: [4, 4] },
-  entero3: { txt: 'entero', frac: [3, 3] }, compara: { fracs: [[1, 3], [1, 4]], signo: '>' }
+  entero3: { txt: 'entero', frac: [3, 3] }, compara: { fracs: [[1, 3], [1, 4]], signo: '>' },
+  tresCuartos: { txt: 'tres cuartos', frac: [3, 4] }, dosTercios: { txt: 'dos tercios', frac: [2, 3] },
+  equivale: { fracs: [[2, 4], [1, 2]], signo: '=' }, mayor34: { fracs: [[3, 4], [1, 4]], signo: '>' }
 };
 const NIVELES = { // conceptos que registra cada nivel (orden de la línea del docente)
   1: ['iguales', 'mitad', 'cuarto', 'tercio'],
-  2: ['formas', 'comparar', 'entero', 'grupo']
+  2: ['formas', 'comparar', 'entero', 'grupo'],
+  3: ['varias', 'equivalencia', 'masMenos']
 };
 
 /* ===================== 3. UTILIDADES ===================== */
@@ -387,6 +428,7 @@ const G = {
   opc: { clic: false, menosEfectos: false, voz: true, tercio: true, sinCaminar: false, aula: false }, nivel: 1,
   est: -1, mapa: [false, false, false, false], piezasMapa: 0,
   pistas: 0, conceptos: { iguales: [0, 0], mitad: [0, 0], cuarto: [0, 0], tercio: [0, 0] },
+  fallos: {}, repasos: [], // ajuste automático: unidades falladas por concepto y repasos hechos
   tInicio: 0, tFin: 0, mudo: false, planes: null, ranuras: [], piezas: [], pickables: []
 };
 
@@ -920,6 +962,9 @@ const ICO = {
   docente: () => svg(`<rect x="18" y="14" width="64" height="78" rx="10" fill="#fff3dc"/><rect x="34" y="6" width="32" height="16" rx="6" fill="#f6c445"/><path d="M30 40 H70 M30 54 H70 M30 68 H58" stroke="#9a6234" stroke-width="6" stroke-linecap="round"/>`),
   aula: () => svg(`<rect x="10" y="18" width="80" height="54" rx="8" fill="#6aa84f" stroke="#9a6234" stroke-width="5"/><path d="M24 36 H60 M24 50 H48" stroke="#fff3dc" stroke-width="5" stroke-linecap="round"/><rect x="40" y="72" width="20" height="18" fill="#9a6234"/>`),
   sinCaminar: () => svg(`<ellipse cx="34" cy="64" rx="12" ry="18" fill="#c98b52"/><ellipse cx="66" cy="40" rx="12" ry="18" fill="#c98b52"/><path d="M14 86 L86 14" stroke="#e2553f" stroke-width="9" stroke-linecap="round"/>`),
+  tresCuartos: () => icoPizza([90, 90, 90, 90], [0, 1, 2]),
+  equivale: () => svg(`<circle cx="25" cy="50" r="22" fill="#e3a35a"/>${sectores([180, 180], [0], 25, 50, 17, '#e2553f', '#f6c445')}<path d="M45 44 H55 M45 56 H55" stroke="#6b3e26" stroke-width="5" stroke-linecap="round"/><circle cx="75" cy="50" r="22" fill="#e3a35a"/>${sectores([90, 90, 90, 90], [0, 1], 75, 50, 17, '#e2553f', '#f6c445')}`),
+  compara3: () => svg(`<circle cx="28" cy="55" r="24" fill="#fff3dc" stroke="#3fb8af" stroke-width="4"/>${sectores([90, 90, 90, 90], [0, 1, 2], 28, 55, 18, '#f6c445', 'none')}<circle cx="74" cy="55" r="24" fill="#fff3dc" stroke="#3fb8af" stroke-width="4"/>${sectores([90, 270], [0], 74, 55, 18, '#f6c445', 'none')}<path d="M28 20 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#f2b632"/>`),
   borrar: () => svg(`<path d="M24 30 H76 L70 90 H30Z" fill="#fff3dc"/><rect x="18" y="18" width="64" height="10" rx="4" fill="#fff3dc"/><rect x="40" y="8" width="20" height="10" rx="4" fill="#fff3dc"/>`)
 };
 // Mini pictograma del mapa (para el botón "Seguir")
@@ -1348,7 +1393,7 @@ async function nombrar(clavePalabra, claveVoz) {
     [...p.txt].forEach((ch, i) => { html += ch === ' ' ? '<span class="letra esp"> </span>' : `<span class="letra" style="animation-delay:${i * 0.08}s">${ch}</span>`; });
     if (p.frac) html += fr(p.frac);
   }
-  el.innerHTML = html; el.classList.remove('oculto');
+  el.innerHTML = html; el.classList.toggle('largo', !!(p.txt && p.txt.length > 8)); el.classList.remove('oculto');
   sonar('campana'); confetiFrente(40);
   pipoGesto('celebra');
   await decir(claveVoz); await esperar(1.0);
@@ -1414,8 +1459,8 @@ async function triangulosMitad(centro, rot, W, D) {
   A.visible = B.visible = false; A.scale.setScalar(1); B.scale.setScalar(1); escenario(centro, 0, 0, false);
 }
 // VER: los pedazos llegan uno a uno y arman la pizza entera
-async function armarEntero(ang, centro, rot, R) {
-  const n = Math.round(360 / ang), y0 = centro.y + 0.3, th = ang * DEG, dc = centroideSector(th, R), ms = FX.demo.slice(0, n);
+async function armarEntero(ang, centro, rot, R, cuantos) { // cuantos < n: arma solo una parte (p. ej. 3 de 4)
+  const n = cuantos || Math.round(360 / ang), y0 = centro.y + 0.3, th = ang * DEG, dc = centroideSector(th, R), ms = FX.demo.slice(0, n);
   escenario(centro, y0, R + 0.1, true);
   ms.forEach((m, i) => { m.geometry = geoPorcion(ang, R, i % 2, true); m.visible = true; m.scale.setScalar(0.01); });
   for (let i = 0; i < n; i++) {
@@ -1628,6 +1673,21 @@ function actualizarDecor(dt) {
 const ALTURA_BASE = { queso: 0.035, pizzaCorte: 0, cuchilla: 0.02, topping: 0.012, porcion: 0, champi: 0, estrella: 0.03, mapa: 0, rectCorte: 0, lasana: 0.02, aceituna: 0.03, tomatito: 0.04 };
 // Zona de toque invisible (más grande que la pieza) para piezas chicas: más fácil con dedos y touchpad
 const ZONA_TOQUE = { queso: 0.12, topping: 0.11, estrella: 0.12, champi: 0.11, cuchilla: 0.14, aceituna: 0.09, tomatito: 0.09, lasana: 0.1, porcion: 0.1 };
+// Pizza en n partes iguales con jamón en las primeras k (N3)
+function texPizzaFrac(n, k) {
+  return hacerTex(128, 128, (x) => {
+    x.fillStyle = '#e3a35a'; x.fillRect(0, 0, 128, 128);
+    const a = 360 / n;
+    for (let i = 0; i < n; i++) {
+      const a0 = (-90 + i * a) * DEG, a1 = (-90 + (i + 1) * a) * DEG;
+      x.fillStyle = i < k ? '#f4a3a8' : (i % 2 ? '#fbd978' : '#f6c445');
+      x.beginPath(); x.moveTo(64, 64); x.arc(64, 64, 64, a0, a1); x.closePath(); x.fill();
+      if (i < k) { x.fillStyle = '#e27f8a'; const m = (a0 + a1) / 2; [[30, 0], [44, 0.25], [44, -0.25]].forEach(([r, d]) => { x.beginPath(); x.arc(64 + Math.cos(m + d) * r, 64 + Math.sin(m + d) * r, 5, 0, TAU); x.fill(); }); }
+    }
+    x.strokeStyle = '#6b3e26'; x.lineWidth = 5; x.lineCap = 'round';
+    for (let i = 0; i < n; i++) { const t = (-90 + i * a) * DEG; x.beginPath(); x.moveTo(64, 64); x.lineTo(64 + Math.cos(t) * 64, 64 + Math.sin(t) * 64); x.stroke(); }
+  }, false);
+}
 // Textura de bandeja de lasaña con cortes (N2): v/h/d = mitades; v30, h28 = partes desiguales; t3 = tercios; q4 = cuartos
 function texRectCorte(corte, hueco) { // hueco: la primera parte (izquierda) se ve vacía (está en el plato)
   return hacerTex(128, 96, (x) => {
@@ -1731,6 +1791,22 @@ function construirProp(tipo, d) {
     case 'porcionFija': return new THREE.Mesh(geoPorcion(d.ang, d.R, 0, true), M.fieltro);
     case 'lasanaFija': { const m = new THREE.Mesh(geoLasana(d.W * d.f, d.D), M.fieltro); m.position.y = 0.02; const g = new THREE.Group(); g.add(m); return g; }
     case 'rectCorte': case 'pizzaCorte': return construirPieza(tipo, d);
+    case 'pizzaFrac': {
+      const g = new THREE.Group(); g.add(new THREE.Mesh(geoPizzaBase(d.R), M.fieltro));
+      const mat = new THREE.MeshLambertMaterial({ map: texPizzaFrac(d.n, d.k) }); MATS_PIZZA.push(mat);
+      const top = new THREE.Mesh(cache('tp' + d.R, () => { const c = new THREE.CircleGeometry(d.R * 0.9, 24); c.rotateX(-PI / 2); return c; }), mat);
+      top.position.y = 0.0245; g.add(top); return g;
+    }
+    case 'sectores': { // k pedazos de 1/n armados juntos sobre un plato
+      const g = new THREE.Group(), th = TAU / d.n, dc = centroideSector(th, d.R) + 0.008;
+      for (let i = 0; i < d.k; i++) { const f = (i + 0.5) * th - d.k * th / 2, m = new THREE.Mesh(geoPorcion(360 / d.n, d.R, i % 2, true), M.fieltro); m.position.set(Math.sin(f) * dc, 0, Math.cos(f) * dc); m.rotation.y = f; g.add(m); }
+      return g;
+    }
+    case 'lasanaSectores': { // k pedazos de 1/n de lasaña, uno al lado del otro
+      const g = new THREE.Group(), w = d.W / d.n;
+      for (let i = 0; i < d.k; i++) { const m = new THREE.Mesh(geoLasana(w, d.D), M.fieltro); m.position.set((i - (d.k - 1) / 2) * (w + 0.01), 0.02, 0); g.add(m); }
+      return g;
+    }
     case 'mitadCortada': return new THREE.Mesh(geoSegmento(0, d.R, d.lado), M.fieltro);
     case 'cajita': {
       const g = new THREE.Group();
@@ -1930,7 +2006,9 @@ function actualizarArrastre(dt) {
 /* ===================== 21. PASOS: progreso, errores que enseñan y conceptos ===================== */
 let PASO = null;
 const EST = { piezas: new Map(), ranuras: new Map(), props: new Map(), extras: [] };
-function registrarUnidad(conceptos, ok) { for (const c of conceptos) { G.conceptos[c][1]++; if (ok) G.conceptos[c][0]++; } }
+function registrarUnidad(conceptos, ok) {
+  for (const c of conceptos) { if (!G.conceptos[c]) continue; G.conceptos[c][1]++; if (ok) G.conceptos[c][0]++; else G.fallos[c] = (G.fallos[c] || 0) + 1; }
+}
 function usarPista() { if (PASO && !PASO.uAyuda) { PASO.uAyuda = true; G.pistas++; } }
 // Crea (o reutiliza) piezas y ranuras de un paso del plan y espera a que se complete
 function hacerPaso(i, def, extra) {
@@ -2154,6 +2232,7 @@ async function cerrarEstacion() {
 }
 // Premio: se abre la cajita y sale una parte del mapa (un cuarto)
 async function premio(i, q) {
+  await repasoSiHaceFalta(i); // ajuste automático: ronda extra si un concepto falló 2 veces
   const caj = EST.props.get('cajita'); if (!caj) return;
   sonar('pop'); pipoGesto('celebra');
   await animarP(0.5, (k) => { caj.userData.tapa.rotation.x = -k * 1.9; }, EASE.back);
@@ -2307,11 +2386,11 @@ function spritePedido(pd) { // pd.ang: porción de pizza ; pd.f: pedazo de lasa�
       x.strokeStyle = '#6b3e26'; x.lineWidth = 4; for (let k = 1; k < n; k++) { x.beginPath(); x.moveTo(16 + k * w, 36); x.lineTo(16 + k * w, 92); x.stroke(); }
       return;
     }
-    const ang = pd.ang;
+    // pd.n partes, pd.k marcadas (por defecto 1). pd.falta: se marca la parte que FALTA
+    const n = pd.n || Math.round(360 / pd.ang), ang = 360 / n, kk = pd.k == null ? 1 : pd.k;
     x.fillStyle = '#e3a35a'; x.beginPath(); x.arc(64, 64, 52, 0, TAU); x.fill();
-    const n = Math.round(360 / ang);
     for (let k = 0; k < n; k++) {
-      x.fillStyle = k === 0 ? '#e2553f' : '#f6c445'; x.beginPath(); x.moveTo(64, 64);
+      x.fillStyle = k < kk ? (pd.falta ? '#f6c445' : '#e2553f') : (pd.falta ? '#fff3dc' : '#f6c445'); x.beginPath(); x.moveTo(64, 64);
       x.arc(64, 64, 44, -PI / 2 + k * ang * DEG, -PI / 2 + (k + 1) * ang * DEG); x.closePath(); x.fill();
       x.strokeStyle = '#6b3e26'; x.lineWidth = 4; x.stroke();
     }
@@ -2376,7 +2455,7 @@ function abrirCandado(k) {
 /* ===================== 23b. NIVEL 2: "La tarde de los pedidos" ===================== */
 // Repasa y amplía: otras formas (lasaña), comparar 1/3 y 1/4, armar el entero y fracción de un grupo.
 const LAS = { W: 0.42, D: 0.26 }; // bandeja de lasaña entera: la MISMA en todas las comparaciones
-function crearPlanesNivel(n) { return n === 2 ? crearPlanes2() : crearPlanes(); }
+function crearPlanesNivel(n) { return n === 3 ? crearPlanes3() : n === 2 ? crearPlanes2() : crearPlanes(); }
 function crearPlanes2() {
   const P = crearPlanes(); // la práctica (0) y el mapa del tesoro (5) se comparten
   const igual = (a, b) => Math.abs(a - b) < 1e-6;
@@ -2570,10 +2649,254 @@ async function n2estacion4() {
   await cerrarEstacion();
 }
 
+/* ===================== 23c. NIVEL 3: "El horno grande" (varios pedazos y equivalencia) ===================== */
+function crearPlanes3() {
+  const P = crearPlanes(); // la práctica (0) y el mapa del tesoro (5) se comparten
+  // N3-1. Identificar 3/4 (estrella a la pizza con 3 de 4 pedazos con jamón) y armar 2/3 con jamón
+  {
+    const R = 0.2, xs = [-0.55, 0.03, 0.61], z = -0.12, ks = barajar([1, 2, 3]);
+    const PT = [0.03, -0.12], RT = 0.24, dt = centroideSector(TAU / 3, RT);
+    const medio = (j) => (-90 + (j + 0.5) * 120) * DEG; // sector j de la textura (empieza arriba, sentido horario)
+    P[1] = { cajita: [1.05, -0.47], ks, PT, RT,
+      props: xs.map((x, j) => ({ id: 'pf' + j, tipo: 'pizzaFrac', pos: [x, z], datos: { R, n: 4, k: ks[j] } })),
+      pasos: {
+        identificar: { id: 'v1a', conceptos: ['varias'], porColocacion: false, necesarios: 1, instr: 'v1Hacer',
+          piezas: [{ id: 'estrella', tipo: 'estrella', home: [0.82, 0.45], destinos: ['pf' + ks.indexOf(3)] }],
+          ranuras: xs.map((x, j) => ({ id: 'pf' + j, pos: [x, z], r: 0.1, anillo: 0.24, y: 0.06, acepta: (p) => p.tipo === 'estrella' && ks[j] === 3 })) },
+        armar: { id: 'v1b', conceptos: [], porColocacion: true, necesarios: 2, instr: 'v1Armar',
+          piezas: [0, 1, 2].map((k) => ({ id: 'jm' + k, tipo: 'topping', datos: { cual: 'jamon' }, home: [-0.4 + k * 0.4, 0.45], destinos: ['jt0', 'jt1', 'jt2'] })),
+          ranuras: [0, 1, 2].map((j) => ({ id: 'jt' + j, pos: [PT[0] + Math.cos(medio(j)) * dt, PT[1] + Math.sin(medio(j)) * dt], r: 0.06, anillo: 0.08, y: 0.035, grupo: 'jt', acepta: (p) => p.tipo === 'topping' && p.datos.cual === 'jamon' })) }
+      } };
+  }
+  // N3-2. Equivalencia: ¿qué plato tiene lo mismo que la mitad? (1/4, 2/4 o 3/4) con pizza y con lasaña
+  {
+    const xs = [-0.45, 0.15, 0.75], z = 0.2, k1 = barajar([1, 2, 3]), k2 = barajar([1, 2, 3]);
+    const ronda = (n, ks, y) => ({ piezas: [{ id: 'est' + n, tipo: 'estrella', home: [0.98, 0.5], destinos: ['q' + n + '_' + ks.indexOf(2)] }],
+      ranuras: xs.map((x, j) => ({ id: 'q' + n + '_' + j, pos: [x, z], r: 0.1, anillo: 0.2, y, acepta: (p) => p.tipo === 'estrella' && ks[j] === 2 })) });
+    P[2] = { cajita: [1.05, -0.47], xs, z, ref: [0.15, -0.3], k1, k2,
+      pasos: {
+        pizza: Object.assign({ id: 'q2a', conceptos: ['equivalencia'], porColocacion: false, necesarios: 1, instr: 'q2Hacer' }, ronda(1, k1, 0.06)),
+        lasana: Object.assign({ id: 'q2b', conceptos: ['equivalencia'], porColocacion: false, necesarios: 1, instr: 'q2Hacer' }, ronda(2, k2, 0.07))
+      } };
+  }
+  // N3-3. Armar 3/4 y 2/3 en la bandeja (sobran pedazos y hay distractores)
+  {
+    const T = [0.3, -0.08], R = 0.25, dc4 = centroideSector(PI / 2, R), dc3 = centroideSector(TAU / 3, R);
+    const homes = [[-1.02, 0.42], [-0.62, 0.42], [-0.22, 0.45], [0.92, 0.42], [-0.62, -0.02], [-0.22, -0.06]], rots = [0, PI / 2, PI, -PI / 2, PI / 4, -PI / 4];
+    const f4 = [0, 1, 2, 3].map((k) => PI / 4 + k * PI / 2), f3 = [0, 1, 2].map((k) => k * TAU / 3);
+    const a1 = barajar([90, 90, 90, 90, 120, 45]), a2 = barajar([120, 120, 120, 90, 180]);
+    P[3] = { cajita: [1.05, -0.47], T,
+      pasos: {
+        cuartos: { id: 'a3a', conceptos: ['varias'], porColocacion: false, necesarios: 3, instr: 'a3Intro',
+          piezas: a1.map((a, k) => ({ id: 'ca' + k, tipo: 'porcion', datos: { ang: a, R, tono: k % 2 }, home: homes[k], rot: rots[k], destinos: a === 90 ? ['s0', 's1', 's2', 's3'] : null })),
+          ranuras: f4.map((f, k) => ({ id: 's' + k, pos: [T[0] + Math.sin(f) * dc4, T[1] + Math.cos(f) * dc4], r: 0.06, anillo: 0.07, y: 0.018, rot: f, grupo: 'c34', err: 'errLleno', acepta: esPorcion(90) })) },
+        tercios: { id: 'a3b', conceptos: ['varias'], porColocacion: false, necesarios: 2, instr: 'a3Tercios',
+          piezas: a2.map((a, k) => ({ id: 'cb' + k, tipo: 'porcion', datos: { ang: a, R, tono: k % 2 }, home: homes[k], rot: rots[k], destinos: a === 120 ? ['u0', 'u1', 'u2'] : null })),
+          ranuras: f3.map((f, k) => ({ id: 'u' + k, pos: [T[0] + Math.sin(f) * dc3, T[1] + Math.cos(f) * dc3], r: 0.06, anillo: 0.08, y: 0.018, rot: f, grupo: 'c23', err: 'errLleno', acepta: esPorcion(120) })) }
+      } };
+  }
+  // N3-4. Más y menos con pedazos iguales: 1/4, 2/4, 3/4 (¿quién tiene más?) y 1/3, 2/3, 3/3 (¿quién tiene menos?)
+  {
+    const platos = [[-0.6, -0.38], [0, -0.38], [0.6, -0.38]], k1 = barajar([1, 2, 3]), k2 = barajar([1, 2, 3]);
+    const ronda = (n, ks, obj) => ({ piezas: [{ id: 'em' + n, tipo: 'estrella', home: [0.15, 0.32], destinos: ['mp' + n + '_' + ks.indexOf(obj)] }],
+      ranuras: platos.map((p, j) => ({ id: 'mp' + n + '_' + j, pos: p, r: 0.1, anillo: 0.2, y: 0.06, acepta: (q) => q.tipo === 'estrella' && ks[j] === obj })) });
+    P[4] = { cajita: [1.08, 0.47], platos, k1, k2,
+      pasos: {
+        mas: Object.assign({ id: 'm4a', conceptos: ['masMenos'], porColocacion: false, necesarios: 1, instr: 'm4Hacer' }, ronda(1, k1, 3)),
+        menos: Object.assign({ id: 'm4b', conceptos: ['masMenos'], porColocacion: false, necesarios: 1, instr: 'm4Menos' }, ronda(2, k2, 1))
+      } };
+  }
+  // N3-5. Ronda del tesoro: tres cuartos, dos tercios y dos cuartos (que es la mitad)
+  {
+    const pedidos = barajar([{ ang: 270, n: 4, k: 3, c: 'varias', voz: 'pedTresCuartos' }, { ang: 240, n: 3, k: 2, c: 'varias', voz: 'pedDosTercios' }, { ang: 180, n: 4, k: 2, c: 'equivalencia', voz: 'pedDosCuartos' }]);
+    const angs = barajar([270, 240, 180, 90, 120]), xs = [-0.98, -0.5, -0.02, 0.46, 0.94];
+    const porciones = angs.map((a, k) => ({ id: 'r' + a, tipo: 'porcion', datos: { ang: a, R: 0.17, tono: k % 2 }, home: [xs[k], 0.36], rot: 0, destinos: null }));
+    Object.keys(P[5].pasos).forEach((k) => { if (k.startsWith('ped')) delete P[5].pasos[k]; });
+    pedidos.forEach((pd, k) => {
+      P[5].pasos['ped' + k] = { id: 'e5p' + k, conceptos: [pd.c], porColocacion: false, necesarios: 1, instr: pd.voz,
+        piezas: porciones.map((s) => Object.assign({}, s, { destinos: s.datos.ang === pd.ang ? ['pl' + k] : null })),
+        ranuras: [{ id: 'pl' + k, pos: P[5].platos[k], r: 0.12, anillo: 0.24, y: 0.02, rot: 0, acepta: esPorcion(pd.ang) }] };
+    });
+    P[5].pedidos = pedidos;
+  }
+  return P;
+}
+function platosConPedazos(i, posiciones, ks, forma, n, prefijo, R) {
+  const objs = [];
+  posiciones.forEach((p, j) => {
+    const pl = crearProp(i, { tipo: 'plato', pos: p, datos: { R: R || 0.18 } }), s = forma === 'lasana'
+      ? crearProp(i, { tipo: 'lasanaSectores', pos: p, y: 0.02, datos: { n, k: ks[j], W: LAS.W, D: LAS.D } })
+      : crearProp(i, { tipo: 'sectores', pos: p, y: 0.02, datos: { n, k: ks[j], R: (R || 0.18) - 0.03 } });
+    EST.props.set(prefijo + 'p' + j, pl); EST.props.set(prefijo + 's' + j, s); objs.push(pl, s); popIn(pl); popIn(s);
+  });
+  return objs;
+}
+// N3-1. Varios pedazos: tres cuartos y dos tercios
+async function n3estacion1() {
+  const i = 1, plan = G.planes[1], rot = MESAS[i].rot, escena = puntoMesa(i, 0.03, 0.15);
+  await llegar(i);
+  setObjetivo('tresCuartos'); await decir('v1Intro');
+  await Promise.all([decir('v1Ver'), armarEntero(90, escena, rot, 0.24, 3)]);
+  setObjetivo('estrella'); decir('v1Hacer');
+  await hacerPaso(i, plan.pasos.identificar, {
+    alColocar: async () => { sonar('campana'); await decir('v1Bien'); },
+    alError: async (p, r) => { const k = plan.ks[+r.id.slice(2)]; decir('errCuenta'); await compararPartes(270, k * 90, escena, 0.26, rot); }
+  });
+  await nombrar('tresCuartos', 'v1Nombre34');
+  await retirar([0, 1, 2].map((j) => EST.props.get('pf' + j)).concat([EST.piezas.get('estrella').obj]));
+  const pt = crearProp(i, { tipo: 'pizzaFrac', pos: plan.PT, datos: { R: plan.RT, n: 3, k: 0 } }); EST.props.set('pt', pt); popIn(pt);
+  setObjetivo('ingred'); decir('v1Armar');
+  await hacerPaso(i, plan.pasos.armar, { alColocar: async () => { sonar('plop'); } });
+  await Promise.all([decir('a3Cuenta2'), saltitos([0, 1, 2].map((j) => EST.ranuras.get('jt' + j)).filter((r) => r.items.length).map((r) => r.items[0].obj))]);
+  await nombrar('dosTercios', 'v1Nombre23');
+  await premio(i, 0);
+  await cerrarEstacion();
+}
+// N3-2. Equivalencia: dos cuartos = una mitad
+async function n3estacion2() {
+  const i = 2, plan = G.planes[2], rot = MESAS[i].rot, escena = puntoMesa(i, -0.15, 0.0), pos = plan.xs.map((x) => [x, plan.z]);
+  await llegar(i);
+  setObjetivo('equivale'); await decir('q2Intro');
+  const ref1 = [crearProp(i, { tipo: 'plato', pos: plan.ref, datos: { R: 0.2 } }), crearProp(i, { tipo: 'porcionFija', pos: plan.ref, y: 0.02, datos: { ang: 180, R: 0.17 } })];
+  ref1.forEach((o, k) => { EST.props.set('ref1' + k, o); popIn(o); });
+  const r1 = platosConPedazos(i, pos, plan.k1, 'pizza', 4, 'a');
+  await Promise.all([decir('q2Ver'), dosCuartosEnMitad(escena, 0.26, rot)]);
+  setObjetivo('estrella'); decir('q2Hacer');
+  await hacerPaso(i, plan.pasos.pizza, {
+    alColocar: async () => { sonar('campana'); await decir('q2Bien'); },
+    alError: async (p, r) => { const k = plan.k1[+r.id.split('_')[1]]; decir(k > 2 ? 'errGrande' : 'errChica'); await compararPartes(180, k * 90, escena, 0.26, rot); }
+  });
+  await retirar(ref1.concat(r1, [EST.piezas.get('est1').obj]));
+  const ref2 = [crearProp(i, { tipo: 'plato', pos: plan.ref, datos: { R: 0.2 } }), crearProp(i, { tipo: 'lasanaFija', pos: plan.ref, y: 0.02, datos: { f: 1 / 2, W: LAS.W, D: LAS.D } })];
+  ref2.forEach((o, k) => { EST.props.set('ref2' + k, o); popIn(o); });
+  platosConPedazos(i, pos, plan.k2, 'lasana', 4, 'b');
+  setObjetivo('lasana'); decir('q2Lasana');
+  await hacerPaso(i, plan.pasos.lasana, {
+    alColocar: async () => { sonar('campana'); await decir('q2Bien'); },
+    alError: async (p, r) => { const k = plan.k2[+r.id.split('_')[1]]; decir(k > 2 ? 'errGrande' : 'errChica'); await compararRect(1 / 2, k / 4, escena, rot, LAS.W, LAS.D); }
+  });
+  await Promise.all([decir('e4Entender'), dosCuartosEnMitad(escena, 0.26, rot)]);
+  await nombrar('equivale', 'q2Nombre');
+  await premio(i, 1);
+  await cerrarEstacion();
+}
+// N3-3. Armar tres cuartos y dos tercios
+async function n3estacion3() {
+  const i = 3, plan = G.planes[3], rot = MESAS[i].rot, escena = puntoMesa(i, -0.45, 0.15);
+  await llegar(i);
+  EST.props.set('bandeja', crearProp(i, { tipo: 'bandeja', pos: plan.T }));
+  setObjetivo('tresCuartos'); await decir('a3Intro');
+  await Promise.all([decir('v1Ver'), armarEntero(90, escena, rot, 0.24, 3)]);
+  decir('a3Intro');
+  await hacerPaso(i, plan.pasos.cuartos, {
+    alColocar: async () => { sonar('campana'); },
+    alError: async (p) => { const a = p.datos.ang; decir(a > 90 ? 'errGrande' : 'errChica'); await compararPartes(90, a, escena, 0.26, rot); }
+  });
+  const llenos = (ids) => ids.map((id) => EST.ranuras.get(id)).filter((r) => r.items.length).map((r) => r.items[0].obj);
+  await Promise.all([decir('a3Cuenta'), saltitos(llenos(['s0', 's1', 's2', 's3']))]);
+  await nombrar('tresCuartos', 'v1Nombre34');
+  await retirar([0, 1, 2, 3, 4, 5].map((k) => EST.piezas.get('ca' + k).obj));
+  setObjetivo('tercio'); decir('a3Tercios');
+  await hacerPaso(i, plan.pasos.tercios, {
+    alColocar: async () => { sonar('campana'); },
+    alError: async (p) => { const a = p.datos.ang; decir(a > 120 ? 'errGrande' : 'errChica'); await compararPartes(120, a, escena, 0.26, rot); }
+  });
+  await Promise.all([decir('a3Cuenta2'), saltitos(llenos(['u0', 'u1', 'u2']))]);
+  await nombrar('dosTercios', 'v1Nombre23');
+  await premio(i, 2);
+  await cerrarEstacion();
+}
+// N3-4. ¿Quién tiene más? ¿Quién tiene menos?
+async function n3estacion4() {
+  const i = 4, plan = G.planes[4], rot = MESAS[i].rot, escena = puntoMesa(i, -0.1, 0.15);
+  await llegar(i);
+  const r1 = platosConPedazos(i, plan.platos, plan.k1, 'pizza', 4, 'a', 0.17);
+  setObjetivo('compara3'); PJ.ratones.forEach((r) => { r.salto = 0.6; });
+  await Promise.all([decir('m4Intro'), saltitos(r1.filter((o, k) => k % 2 === 1))]);
+  setObjetivo('estrella'); decir('m4Hacer');
+  await hacerPaso(i, plan.pasos.mas, {
+    alColocar: async () => { sonar('campana'); PJ.ratones[plan.k1.indexOf(3)].salto = 0.8; await decir('m4Bien'); },
+    alError: async (p, r) => { const k = plan.k1[+r.id.split('_')[1]]; decir('errChica'); await compararPartes(270, k * 90, escena, 0.26, rot); }
+  });
+  await retirar(r1.concat([EST.piezas.get('em1').obj]));
+  platosConPedazos(i, plan.platos, plan.k2, 'pizza', 3, 'b', 0.17);
+  decir('m4Menos');
+  await hacerPaso(i, plan.pasos.menos, {
+    alColocar: async () => { sonar('campana'); PJ.ratones[plan.k2.indexOf(1)].salto = 0.8; await decir('m4Bien2'); },
+    alError: async (p, r) => { const k = plan.k2[+r.id.split('_')[1]]; decir('errGrande'); await compararPartes(120, k * 120, escena, 0.26, rot); }
+  });
+  await Promise.all([decir('m4Entender'), compararPartes(270, 90, escena, 0.26, rot)]);
+  await nombrar('mayor34', 'm4Nombre');
+  await premio(i, 3);
+  await cerrarEstacion();
+}
+
+/* ===================== 23d. REPASO AUTOMÁTICO (si un concepto falla 2 veces, una ronda extra corta) ===================== */
+function planRepaso(c) {
+  const homes = barajar([[-0.7, 0.35], [-0.15, 0.38], [0.42, 0.38]]), plato = [0.2, -0.22];
+  const op = (tipo, lista, ok, voz, pd, extra) => Object.assign({ voz, pd, paso: { id: 'rep_' + c, conceptos: [], porColocacion: false, necesarios: 1, instr: voz,
+    piezas: lista.map((d, k) => ({ id: 'rp' + k, tipo, datos: d, home: homes[k], rot: 0, destinos: ok(d) ? ['rpl'] : null })),
+    ranuras: [{ id: 'rpl', pos: plato, r: 0.12, anillo: 0.24, y: 0.02, rot: 0, acepta: (p) => p.tipo === tipo && ok(p.datos) }] } }, extra);
+  const por = (angs, obj, voz, pd) => op('porcion', angs.map((a) => ({ ang: a, R: 0.17, tono: 0 })), (d) => d.ang === obj, voz, pd, { objetivo: obj });
+  switch (c) {
+    case 'iguales': return op('pizzaCorte', [{ R: 0.15, partes: [90, 90, 90, 90], giro: 0, iguales: true }, { R: 0.15, partes: [200, 100, 60], giro: 30, iguales: false }, { R: 0.15, partes: [240, 120], giro: 0, iguales: false }], (d) => d.iguales, 'repIguales', { n: 4, k: 0 });
+    case 'mitad': return por([180, 120, 240], 180, 'pedMitad', { n: 2, k: 1 });
+    case 'cuarto': return por([90, 120, 45], 90, 'pedCuarto', { n: 4, k: 1 });
+    case 'tercio': return por([120, 90, 180], 120, 'pedTercio', { n: 3, k: 1 });
+    case 'formas': return op('lasana', [1 / 2, 1 / 3, 2 / 3].map((f) => ({ f, W: LAS.W, D: LAS.D })), (d) => Math.abs(d.f - 0.5) < 1e-6, 'pedLMitad', { f: 1 / 2 }, { objetivoF: 1 / 2 });
+    case 'comparar': return por([120, 90, 60], 120, 'repMasGrande', { n: 3, k: 1 });
+    case 'entero': return por([90, 120, 45], 90, 'repFalta', { n: 4, k: 3, falta: true });
+    case 'varias': return por([270, 180, 90], 270, 'pedTresCuartos', { n: 4, k: 3 });
+    case 'equivalencia': return por([180, 90, 270], 180, 'pedDosCuartos', { n: 4, k: 2 });
+    case 'masMenos': return por([270, 90, 180], 270, 'repMasGrande', { n: 4, k: 3 });
+    case 'grupo': {
+      const hs = [[-0.6, 0.35], [-0.2, 0.35], [0.2, 0.35], [0.6, 0.35]], pl = [[-0.3, -0.3], [0.4, -0.3]];
+      return { voz: 'repGrupo', pd: null, platos: pl, paso: { id: 'rep_grupo', conceptos: [], porColocacion: false, necesarios: 4, instr: 'repGrupo',
+        piezas: hs.map((h, k) => ({ id: 'rp' + k, tipo: 'aceituna', home: h, rot: k, destinos: ['rg0', 'rg1'] })),
+        ranuras: pl.map((p, k) => ({ id: 'rg' + k, pos: p, r: 0.1, anillo: 0.18, y: 0.02, cap: 2, poses: [[-0.05, 0], [0.05, 0]], lleno: true, err: 'g4Lleno', acepta: (q) => q.tipo === 'aceituna' })) } };
+    }
+  }
+  return null;
+}
+function conceptoParaRepaso() {
+  const cand = NIVELES[G.nivel].filter((c) => (G.fallos[c] || 0) >= 2 && G.repasos.indexOf(c) < 0);
+  cand.sort((a, b) => G.fallos[b] - G.fallos[a]);
+  return cand[0] || null;
+}
+async function repasoSiHaceFalta(i) {
+  const c = conceptoParaRepaso(); if (!c || !G.estacionLista) return;
+  const rp = planRepaso(c); if (!rp) return;
+  G.repasos.push(c);
+  // se despeja la mesa (queda la cajita)
+  const fuera = [];
+  EST.piezas.forEach((p) => { if (p.obj.visible) fuera.push(p.obj); });
+  EST.props.forEach((o, k) => { if (k !== 'cajita' && o.visible) fuera.push(o); });
+  EST.extras.forEach((o) => { if (o.visible) fuera.push(o); });
+  await retirar(fuera);
+  pipoGesto('celebra'); await decir('repasoIntro');
+  const objs = [], rot = MESAS[i].rot, escena = puntoMesa(i, -0.2, 0.05);
+  (rp.platos || [[0.2, -0.22]]).forEach((p, k) => { const o = crearProp(i, { tipo: 'plato', pos: p, datos: { R: rp.platos ? 0.17 : 0.22 } }); EST.props.set('rpo' + k, o); popIn(o); objs.push(o); });
+  if (rp.pd) { const s = spritePedido(rp.pd), w = puntoMesa(i, 0.2, -0.22); s.position.set(w.x, CONFIG.MESA_H + 0.32, w.z); s.scale.setScalar(0.3); scene.add(s); EST.extras.push(s); objs.push(s); }
+  setObjetivo(CONTENIDO[rp.voz].icono); decir(rp.voz);
+  await hacerPaso(i, rp.paso, {
+    alColocar: async () => { sonar('campana'); },
+    alError: async (p, r) => {
+      if (p.tipo === 'porcion' && rp.objetivo) { const a = p.datos.ang; decir(a > rp.objetivo ? 'errGrande' : 'errChica'); await compararPartes(rp.objetivo, a, escena, 0.26, rot); }
+      else if (p.tipo === 'lasana') { const f = p.datos.f; decir(f > rp.objetivoF ? 'errGrande' : 'errChica'); await compararRect(rp.objetivoF, f, escena, rot, LAS.W, LAS.D); }
+      else if (p.tipo === 'pizzaCorte') { const pt = p.datos.partes; decir('errNoIguales'); await compararPartes(Math.max(...pt), Math.min(...pt), escena, 0.26, rot); }
+      else await decir(r.errVoz || 'errPlato');
+    }
+  });
+  pipoGesto('celebra'); await decir('repasoBien');
+  const piezas = []; EST.piezas.forEach((p, id) => { if (id.startsWith('rp') && p.obj.visible) piezas.push(p.obj); });
+  await retirar(objs.concat(piezas));
+}
+
 /* ===================== 24. FLUJO: MENU → INTRO → TUTORIAL → EST1..EST5 → RESULTADO ===================== */
 const GUIONES = {
   1: [intro, estacion0, estacion1, estacion2, estacion3, estacion4, estacion5],
-  2: [intro, estacion0, n2estacion1, n2estacion2, n2estacion3, n2estacion4, estacion5]
+  2: [intro, estacion0, n2estacion1, n2estacion2, n2estacion3, n2estacion4, estacion5],
+  3: [intro, estacion0, n3estacion1, n3estacion2, n3estacion3, n3estacion4, estacion5]
 };
 async function correr(desde) {
   const guion = GUIONES[G.nivel];
@@ -2588,7 +2911,7 @@ function leerLS(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (
 function escribirLS(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } }
 function guardarPartida(siguiente) {
   escribirLS(CLAVE_PARTIDA, { v: 1, nombre: G.nombre, nivel: G.nivel, opc: G.opc, siguiente, mapa: G.mapa, piezasMapa: G.piezasMapa,
-    pistas: G.pistas, conceptos: G.conceptos, tiempo: Math.round(G.t - G.tInicio), fecha: Date.now() });
+    pistas: G.pistas, conceptos: G.conceptos, fallos: G.fallos, repasos: G.repasos, tiempo: Math.round(G.t - G.tInicio), fecha: Date.now() });
 }
 function partidaGuardada() {
   const s = leerLS(CLAVE_PARTIDA);
@@ -2601,7 +2924,7 @@ function leerOpciones() {
 }
 function arrancar() { // común a jugar y seguir: audio, voz y HUD
   if (G.opc.menosEfectos) PART.limite = 30;
-  if (G.nivel === 2) G.opc.tercio = true; // el nivel 2 siempre trabaja tercios
+  if (G.nivel >= 2) G.opc.tercio = true; // los niveles 2 y 3 siempre trabajan tercios
   iniciarAudio(); iniciarMusica();
   try { if (G.opc.voz && 'speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } } catch (e) { }
   G.planes = crearPlanesNivel(G.nivel);
@@ -2613,7 +2936,7 @@ function jugar() {
   if (G.estado !== 'MENU') return;
   let n = ($('nombre').value || '').trim().replace(/\s+/g, ' ').slice(0, 14);
   G.nombre = n ? n.charAt(0).toUpperCase() + n.slice(1) : 'Ayudante';
-  leerOpciones(); G.conceptos = conceptosVacios(G.nivel);
+  leerOpciones(); G.conceptos = conceptosVacios(G.nivel); G.fallos = {}; G.repasos = [];
   escribirLS(CLAVE_PARTIDA, null);
   arrancar(); G.tInicio = G.t;
   correr(0);
@@ -2622,6 +2945,7 @@ function seguirPartida() {
   const s = partidaGuardada(); if (!s || G.estado !== 'MENU') return;
   G.nombre = s.nombre; G.nivel = s.nivel; Object.assign(G.opc, s.opc);
   G.conceptos = Object.assign(conceptosVacios(G.nivel), s.conceptos); G.pistas = s.pistas || 0;
+  G.fallos = s.fallos || {}; G.repasos = s.repasos || [];
   G.mapa = s.mapa.slice(0, 4); G.piezasMapa = s.piezasMapa; dibujarMinimapa();
   arrancar(); G.tInicio = G.t - (s.tiempo || 0);
   G.estado = 'TUTORIAL'; G.modo = 'caminar'; JUG.x = 0; JUG.z = 3.6; JUG.yaw = 0; JUG.pitch = 0;
@@ -2651,7 +2975,7 @@ async function intro() {
   const P = PJ.pipo; P.modo = 'intro'; P.pos.set(-2.6, 0, 2.2);
   const dolly = animar(14, (k) => { camera.position.z = 3.9 - k * 1.8; camera.lookAt(0, 1.85, -4.9); }, EASE.suave);
   await esperar(0.6);
-  await decir(G.nivel === 2 ? 'introL2' : 'intro1'); await decir('intro2');
+  await decir({ 1: 'intro1', 2: 'introL2', 3: 'introL3' }[G.nivel]); await decir('intro2');
   await decir('intro3'); await decir('intro4');
   cancelarAnim(dolly); pipoSaltar(new V3(0, 0, 1.0), 0.7, 'intro');
   camTmp.position.copy(camera.position); camTmp.lookAt(0, 0.5, 1.0);
@@ -2704,12 +3028,13 @@ function textoResultado() {
   const seg = Math.max(0, Math.round(G.tFin - G.tInicio)), t = `${Math.floor(seg / 60)}:${String(seg % 60).padStart(2, '0')}`;
   const est = G.pistas === 0 ? 3 : G.pistas <= 2 ? 2 : 1, c = G.conceptos;
   const f = (k) => (k === 'tercio' && !G.opc.tercio) ? 'tercio -' : `${k} ${c[k][0]}/${c[k][1]}`;
-  const nivel = G.nivel === 2 ? ' | Nivel 2' : '';
-  return { t, est, linea: `${G.nombre}${nivel} | ${t} | ${est} ${est === 1 ? 'estrella' : 'estrellas'} | ${NIVELES[G.nivel].map(f).join(', ')} | ${G.pistas} ${G.pistas === 1 ? 'pista' : 'pistas'}` };
+  const nivel = G.nivel > 1 ? ' | Nivel ' + G.nivel : '', repaso = G.repasos.length ? ' | repaso: ' + G.repasos.join(', ') : '';
+  return { t, est, linea: `${G.nombre}${nivel} | ${t} | ${est} ${est === 1 ? 'estrella' : 'estrellas'} | ${NIVELES[G.nivel].map(f).join(', ')} | ${G.pistas} ${G.pistas === 1 ? 'pista' : 'pistas'}${repaso}` };
 }
 const TARJETAS = { // "Lo que aprendí": ícono, palabra y símbolo de cada concepto
   iguales: ['iguales', 'iguales', '='], mitad: ['mitad', 'mitad', '1/2'], cuarto: ['cuarto', 'cuarto', '1/4'], tercio: ['tercio', 'tercio', '1/3'],
-  formas: ['lasana', 'otras formas', '1/2 · 1/3 · 1/4'], comparar: ['compara2', 'comparar', '1/3 > 1/4'], entero: ['entero', 'entero', '4/4 · 3/3'], grupo: ['grupo', 'grupos', '½ y ⅓ de 6']
+  formas: ['lasana', 'otras formas', '1/2 · 1/3 · 1/4'], comparar: ['compara2', 'comparar', '1/3 > 1/4'], entero: ['entero', 'entero', '4/4 · 3/3'], grupo: ['grupo', 'grupos', '½ y ⅓ de 6'],
+  varias: ['tresCuartos', 'varios pedazos', '3/4 · 2/3'], equivalencia: ['equivale', 'igual a la mitad', '2/4 = 1/2'], masMenos: ['compara3', 'más y menos', '3/4 > 1/4']
 };
 function mostrarResultado() {
   G.estado = 'RESULTADO'; G.tFin = G.t; actualizarUI();
@@ -2789,7 +3114,7 @@ function prepararUI() {
   $('bDocente').innerHTML = ICO.docente(); $('bCopiarHist').innerHTML = ICO.copiar() + ' Copiar todo'; $('bBorrarHist').innerHTML = ICO.borrar() + ' Borrar';
   // Elegir nivel
   const btnNivel = document.querySelectorAll('#niveles .nivel');
-  btnNivel[0].innerHTML = ICO.mitad() + '1'; btnNivel[1].innerHTML = ICO.lasana() + '2';
+  btnNivel[0].innerHTML = ICO.mitad() + '1'; btnNivel[1].innerHTML = ICO.lasana() + '2'; btnNivel[2].innerHTML = ICO.tresCuartos() + '3';
   const elegirNivel = (n) => { G.nivel = n; btnNivel.forEach((b) => b.classList.toggle('sel', +b.dataset.nivel === n)); };
   btnNivel.forEach((b) => b.addEventListener('click', (e) => { e.preventDefault(); elegirNivel(+b.dataset.nivel); sonar('tic'); }));
   // Seguir una partida guardada en esta computadora
@@ -2829,7 +3154,7 @@ function prepararUI() {
   if (q.get('tercio') === '0') $('oTercio').checked = false;
   if (q.get('caminar') === '0') $('oSinCaminar').checked = true;
   if (q.get('aula') === '1') $('oAula').checked = true;
-  if (q.get('nivel') === '2') elegirNivel(2);
+  if (q.get('nivel') === '2' || q.get('nivel') === '3') elegirNivel(+q.get('nivel'));
   const pq = parseInt(q.get('pistas'), 10); // ?pistas=15 → primera pista a los 15 s (y las demás en proporción)
   if (pq >= 8 && pq <= 60) CONFIG.PISTAS = [pq, Math.round(pq * 2), Math.round(pq * 3.5)];
   if (q.get('docente') === '1') $('bDocente').classList.remove('oculto');
@@ -2892,9 +3217,9 @@ function autotest() {
   const ok = (c, msg) => { if (c) pass++; else { fail++; lineas.push('FAIL ' + msg); } };
   const res = { tipo: '', ranura: null }, q = new V3();
   const dePlan = (sp) => ({ id: sp.id, tipo: sp.tipo, datos: sp.datos || {} });
-  [1, 2].forEach((nivel) => {
-    const planes = G.planes && G.nivel === nivel ? G.planes : crearPlanesNivel(nivel), N = 'N' + nivel + ' ';
+  const revisarPlanes = (planes, N) => {
     planes.forEach((plan, i) => {
+      if (!plan) return;
       const v = vistaMesa(i); camTmp.position.copy(v.pos); camTmp.quaternion.copy(v.quat); camTmp.updateMatrixWorld();
       const enVista = (x, z, que) => { const w = aMundo(i, x, z, new V3()); q.set(w.x, CONFIG.MESA_H + 0.05, w.z).project(camTmp); ok(Math.abs(q.x) <= 0.95 && q.y > -0.8 && q.y < 0.88, `${N}E${i} ${que} fuera de la vista`); ok(Math.abs(x) <= 1.25 && Math.abs(z) <= 0.66, `${N}E${i} ${que} fuera del tablero`); };
       Object.keys(plan.pasos).forEach((nom) => {
@@ -2928,13 +3253,20 @@ function autotest() {
         ok(ranuras.reduce((a, r) => a + r.capacidad, 0) >= def.necesarios, `${N}E${i} paso ${def.id}: no caben las piezas`);
       });
     });
+  };
+  // Rondas de repaso automático: cada concepto, probado en cada mesa de estación
+  const rep = {}; Object.values(NIVELES).flat().forEach((c) => { const r = planRepaso(c); ok(!!r, `sin repaso para ${c}`); if (r) rep[c] = r.paso; ok(!r || !!CONTENIDO[r.voz], `repaso ${c} sin voz`); });
+  revisarPlanes([null, { pasos: rep }, { pasos: rep }, { pasos: rep }, { pasos: rep }, null], 'Repaso ');
+  [1, 2, 3].forEach((nivel) => {
+    const planes = G.planes && G.nivel === nivel ? G.planes : crearPlanesNivel(nivel), N = 'N' + nivel + ' ';
+    revisarPlanes(planes, N);
     // Matemática del contenido
     const den = (f) => Math.round(1 / f);
     if (nivel === 1) {
       planes[1].pasos.e1.piezas.forEach((sp) => { const s = sp.datos.partes.reduce((a, b) => a + b, 0), igual = sp.datos.partes.every((x) => x === sp.datos.partes[0]); ok(s === 360, `pizza ${sp.id} no suma 360`); ok(igual === sp.datos.iguales, `pizza ${sp.id} mal clasificada`); });
       planes[5].pedidos.forEach((pd) => ok(Math.abs(360 / pd.ang - { mitad: 2, tercio: 3, cuarto: 4 }[pd.c]) < 1e-9, `pedido ${pd.c} con ${pd.ang}°`));
       ok(planes[2].pizzas.filter((p) => p.dFrac === 0).length === 1, 'estación 2: debe haber 1 sola línea por el centro');
-    } else {
+    } else if (nivel === 2) {
       planes[1].pasos.f1.piezas.forEach((sp) => ok(sp.datos.mitad === ['v', 'h', 'd'].includes(sp.datos.corte), `N2 bandeja ${sp.datos.corte} mal clasificada`));
       planes[1].pasos.f1.piezas.forEach((sp) => { if (sp.datos.cmp) ok(Math.abs(sp.datos.cmp[0] + sp.datos.cmp[1] - 1) < 1e-9 || sp.datos.corte === 't3', `N2 partes de ${sp.datos.corte} no suman 1`); });
       ok(1 / 3 > 1 / 4, 'un tercio > un cuarto');
@@ -2944,6 +3276,14 @@ function autotest() {
       ok(g.mitad.ranuras.length * g.mitad.ranuras[0].cap === 6 && g.mitad.ranuras[0].cap === 6 / 2, 'N2 mitad de 6 = 3');
       ok(g.tercio.ranuras.length * g.tercio.ranuras[0].cap === 6 && g.tercio.ranuras[0].cap === 6 / 3, 'N2 tercio de 6 = 2');
       planes[5].pedidos.forEach((pd) => ok({ 2: 'pedLMitad', 3: 'pedLTercio', 4: 'pedLCuarto' }[den(pd.f)] === pd.voz, `N2 pedido ${pd.voz} con ${pd.f}`));
+    } else if (nivel === 3) {
+      const p1 = planes[1];
+      ok(p1.ks.slice().sort().join() === '1,2,3', 'N3 pizzas con 1/4, 2/4 y 3/4'); ok(p1.pasos.identificar.piezas[0].destinos[0] === 'pf' + p1.ks.indexOf(3), 'N3 la estrella va a 3/4');
+      ok(p1.pasos.armar.necesarios === 2 && p1.pasos.armar.ranuras.length === 3, 'N3 dos tercios = 2 de 3');
+      const p2 = planes[2]; ok(2 * 90 === 180 && p2.k1.indexOf(2) >= 0 && p2.k2.indexOf(2) >= 0, 'N3 2/4 = 1/2');
+      const p3 = planes[3].pasos; ok(p3.cuartos.necesarios * 90 === 360 * 3 / 4, 'N3 tres cuartos'); ok(p3.tercios.necesarios * 120 === 360 * 2 / 3, 'N3 dos tercios');
+      const p4 = planes[4]; ok(Math.max(...p4.k1) === 3 && Math.min(...p4.k2) === 1, 'N3 más (3/4) y menos (1/3)');
+      planes[5].pedidos.forEach((pd) => ok(Math.abs(pd.ang - 360 * pd.k / pd.n) < 1e-9, `N3 pedido ${pd.voz}: ${pd.ang}° = ${pd.k}/${pd.n}`));
     }
   });
   // aMundo coincide con el THREE.Group de cada mesa
@@ -2953,7 +3293,7 @@ function autotest() {
   Object.keys(CONTENIDO).forEach((k) => { const n = rellenar(CONTENIDO[k].sub, { n: 'Ana' }).split(/\s+/).filter(Boolean).length; ok(n <= 4, `subtítulo "${k}" tiene ${n} palabras`); });
   const resumen = `${fail ? 'FAIL' : 'PASS'}  (${pass} comprobaciones correctas, ${fail} fallas)`;
   window.__autotest = { pass, fail, lineas, resumen };
-  const t = $('toast'); t.textContent = 'AUTOTEST (niveles 1 y 2): ' + resumen + (lineas.length ? '\n' + lineas.join('\n') : '\nCada pieza encaja en su ranura correcta y no en una lejana.\nTodo cae dentro de la mesa y de la vista.\nSe puede completar con toca-y-toca.') + '\n\n(clic para cerrar)';
+  const t = $('toast'); t.textContent = 'AUTOTEST (niveles 1, 2, 3 y repasos): ' + resumen + (lineas.length ? '\n' + lineas.join('\n') : '\nCada pieza encaja en su ranura correcta y no en una lejana.\nTodo cae dentro de la mesa y de la vista.\nSe puede completar con toca-y-toca.') + '\n\n(clic para cerrar)';
   t.classList.remove('oculto'); t.onclick = () => t.classList.add('oculto');
   console.log('AUTOTEST', resumen, lineas);
   return window.__autotest;
